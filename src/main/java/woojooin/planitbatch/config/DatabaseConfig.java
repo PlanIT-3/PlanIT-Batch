@@ -6,19 +6,31 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.batch.core.configuration.annotation.BatchConfigurer;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.support.SimpleJobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
+@EnableBatchProcessing
 @PropertySource("classpath:application.properties")
 @MapperScan("woojooin.planitbatch.mapper")
-public class DatabaseConfig {
+public class DatabaseConfig implements BatchConfigurer {
 
     @Value("${jdbc.driver}")
     private String driverClassName;
@@ -32,7 +44,20 @@ public class DatabaseConfig {
     @Value("${jdbc.password}")
     private String password;
 
+    @Value("${batch.jdbc.driver}")
+    private String batchDriverClassName;
+
+    @Value("${batch.jdbc.url}")
+    private String batchUrl;
+
+    @Value("${batch.jdbc.username}")
+    private String batchUsername;
+
+    @Value("${batch.jdbc.password}")
+    private String batchPassword;
+
     @Bean
+    @Primary
     public DataSource dataSource() {
         HikariConfig config = new HikariConfig();
         config.setDriverClassName(driverClassName);
@@ -40,6 +65,23 @@ public class DatabaseConfig {
         config.setUsername(username);
         config.setPassword(password);
         config.setMaximumPoolSize(10);
+
+        config.setConnectionTimeout(20000);
+        config.setIdleTimeout(300000);
+        config.setMaxLifetime(1200000);
+        config.setLeakDetectionThreshold(15000);
+
+        return new HikariDataSource(config);
+    }
+
+    @Bean("batchDataSource")
+    public DataSource batchDataSource() {
+        HikariConfig config = new HikariConfig();
+        config.setDriverClassName(batchDriverClassName);
+        config.setJdbcUrl(batchUrl);
+        config.setUsername(batchUsername);
+        config.setPassword(batchPassword);
+        config.setMaximumPoolSize(5);
 
         config.setConnectionTimeout(20000);
         config.setIdleTimeout(300000);
@@ -67,4 +109,40 @@ public class DatabaseConfig {
     public SqlSessionTemplate sqlSessionTemplate() throws Exception {
         return new SqlSessionTemplate(sqlSessionFactory());
     }
+
+    @Bean("batchTransactionManager")
+    public PlatformTransactionManager batchTransactionManager() {
+        return new DataSourceTransactionManager(batchDataSource());
+    }
+
+    @Override
+    public JobRepository getJobRepository() throws Exception {
+        JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
+        factory.setDataSource(batchDataSource());
+        factory.setTransactionManager(batchTransactionManager());
+        factory.afterPropertiesSet();
+        return factory.getObject();
+    }
+
+    @Override
+    public PlatformTransactionManager getTransactionManager() throws Exception {
+        return batchTransactionManager();
+    }
+
+    @Override
+    public JobLauncher getJobLauncher() throws Exception {
+        SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+        jobLauncher.setJobRepository(getJobRepository());
+        jobLauncher.afterPropertiesSet();
+        return jobLauncher;
+    }
+
+    @Override
+    public JobExplorer getJobExplorer() throws Exception {
+        JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
+        jobExplorerFactoryBean.setDataSource(batchDataSource());
+        jobExplorerFactoryBean.afterPropertiesSet();
+        return jobExplorerFactoryBean.getObject();
+    }
+
 }
