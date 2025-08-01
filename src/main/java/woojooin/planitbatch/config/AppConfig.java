@@ -12,6 +12,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @ComponentScan(basePackages = "woojooin.planitbatch")
 @PropertySource("classpath:application.properties")
-@Import({DatabaseConfig.class, TestBatchConfig.class})
+@Import({DatabaseConfig.class})
 public class AppConfig {
 }
