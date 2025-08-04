@@ -3,7 +3,7 @@ package woojooin.planitbatch;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import woojooin.planitbatch.config.AppConfig;
+import woojooin.planitbatch.global.config.AppConfig;
 
 public class BatchApplication {
     public static void main(String[] args) {
