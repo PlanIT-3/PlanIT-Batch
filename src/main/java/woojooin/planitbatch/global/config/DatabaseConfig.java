@@ -1,4 +1,4 @@
-package woojooin.planitbatch.config;
+package woojooin.planitbatch.global.config;
 
 import javax.sql.DataSource;
 
