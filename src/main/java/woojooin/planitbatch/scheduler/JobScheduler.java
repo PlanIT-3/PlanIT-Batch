@@ -14,18 +14,26 @@ public class JobScheduler {
     @Autowired
     private JobLauncher jobLauncher;
 
+    // === 예적금 세금 계산 Job ===
     @Autowired
-    private Job testJob; // 실행 Job
+    private Job depositTaxCalculationJob;
 
-    @Scheduled(cron = "0 46 13 * * ?") // 트리거 타임
-    public void runTestJob() {
+    /**
+     * 예적금 세금 계산 배치 실행
+     * 매일 새벽 2시 실행
+     */
+    @Scheduled(cron = "0 0 2 * * ?")
+    public void runDepositTaxCalculationJob() {
         try {
-            // JobParameters jobParameters = new JobParametersBuilder()
-            //     .addLong("timestamp", System.currentTimeMillis())
-            //     .toJobParameters();
-            //
-            // jobLauncher.run(testJob, jobParameters);
+            JobParameters jobParameters = new JobParametersBuilder()
+                .addLong("timestamp", System.currentTimeMillis())
+                .addString("jobName", "depositTaxCalculation")
+                .toJobParameters();
+            
+            jobLauncher.run(depositTaxCalculationJob, jobParameters);
+            
         } catch (Exception e) {
+            System.err.println("Failed to execute deposit tax calculation job: " + e.getMessage());
             e.printStackTrace();
         }
     }
