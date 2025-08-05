@@ -51,4 +51,14 @@
         )
     </update>
 
+    <select id="getMembersPaginated" parameterType="map" resultType="woojooin.planitbatch.domain.vo.Member">
+        SELECT member_id as memberId
+        FROM member
+        <if test="lastMemberId != null">
+            WHERE member_id >= #{lastMemberId}
+        </if>
+        ORDER BY member_id
+        LIMIT #{limit}
+    </select>
+
 </mapper>
