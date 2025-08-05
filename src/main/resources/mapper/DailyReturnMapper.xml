@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="woojooin.planitbatch.domain.mapper.DailyReturnMapper">
+    <select id="findAllForToday" resultType="woojooin.planitbatch.domain.vo.DailyReturn">
+        SELECT
+            mp.member_id AS memberId,
+            mp.product_id AS itemCode,
+            p.bas_dt AS returnDate,
+            CAST(p.clpr AS DECIMAL(20,2)) * mp.quantity AS amount
+        FROM member_product mp
+                 JOIN product p ON mp.product_id COLLATE utf8mb4_unicode_ci = p.isin_cd COLLATE utf8mb4_unicode_ci
+        WHERE DATE(p.bas_dt) = #{date}
+    </select>
+
+
+    <select id="insert" parameterType="woojooin.planitbatch.domain.vo.DailyReturn">
+        INSERT INTO daily_return (member_id, item_code, return_date, amount)
+        VALUES (#{memberId}, #{itemCode}, #{returnDate}, #{amount})
+    </select>
+</mapper>
+
