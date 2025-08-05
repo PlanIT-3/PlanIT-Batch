@@ -29,7 +29,7 @@ import com.zaxxer.hikari.HikariDataSource;
 @Configuration
 @EnableBatchProcessing
 @PropertySource("classpath:application.properties")
-@MapperScan("woojooin.planitbatch.mapper")
+@MapperScan("woojooin.planitbatch.domain.mapper")
 public class DatabaseConfig implements BatchConfigurer {
 
     @Value("${jdbc.driver}")
