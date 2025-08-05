@@ -1,0 +1,16 @@
+services:
+  plan-it-batch:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: plan-it-batch
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    networks:
+      - plan-it-network
+
+networks:
+  plan-it-network:
+    external: true
