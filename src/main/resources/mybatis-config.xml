@@ -12,4 +12,10 @@
         <package name="woojooin.planit.domain.member.domain"/>
     </typeAliases>
 
+    <typeHandlers>
+        <typeHandler
+                javaType="woojooin.planitbatch.domain.product.enums.InvestType"
+                handler="org.apache.ibatis.type.EnumTypeHandler"/>
+    </typeHandlers>
+
 </configuration>
