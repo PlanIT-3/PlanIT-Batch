@@ -28,14 +28,23 @@ public class BatchScheduler {
 		String jobName = isaTaxSavingJob.getName();
 
 		// 1. 최근 실행된 JobInstance 가져오기
+		long minIntervalMillis = 5 * 60 * 1000; // 5분
 		for (JobInstance instance : jobExplorer.getJobInstances(jobName, 0, 10)) {
 			for (JobExecution execution : jobExplorer.getJobExecutions(instance)) {
 				if (execution.isRunning()) {
-					log.warn("⚠️ Job '{}' 이(가) 아직 실행 중이므로, 새 실행을 건너뜁니다.", jobName);
+					log.warn("⚠️ Job '{}' si still running!!!!!!!!!, jump!!!!!!.", jobName);
 					return;
+				}
+				if (execution.getEndTime() != null) {
+					long elapsed = System.currentTimeMillis() - execution.getEndTime().getTime();
+					if (elapsed < minIntervalMillis) {
+						log.warn("⚠️ Job '{}' recently ended!!!!!!!!!! run{}s after!!!!!!!.", jobName, minIntervalMillis/1000);
+						return;
+					}
 				}
 			}
 		}
+
 
 		// 2. 실행
 		jobLauncher.run(isaTaxSavingJob, new JobParametersBuilder()
