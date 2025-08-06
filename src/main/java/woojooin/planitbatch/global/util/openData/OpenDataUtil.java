@@ -42,5 +42,51 @@ public class OpenDataUtil {
 		return ETFResponse;
 	}
 
+	/**
+	 *
+	 * @param pageNo : 페이징 순서
+	 * @param pageSize : 페이징 사이즈
+	 * @return
+	 */
+	public OpenApiResponse<ETFPriceRes> getTodayETFPriceInfo(int pageNo, int pageSize) {
+
+		StringBuilder uriBuilder = new StringBuilder();
+
+		uriBuilder.append(OPEN_API_BASE_URL).append("/getETFPriceInfo")
+			.append("?").append("serviceKey=").append(OPEN_API_SERVICE_KEY)
+			.append("&").append("resultType=").append("json")
+			.append("&").append("pageSize=").append(pageSize)
+			.append("&").append("pageNo=").append(pageNo);
+
+		String response = ConnectionUtil.sendRequest(uriBuilder.toString());
+
+		TypeReference<OpenApiResponse<ETFPriceRes>> type = new TypeReference<>() {
+		};
+		OpenApiResponse<ETFPriceRes> ETFResponse = ConnectionUtil.decodeJsonStringToDto(response, type,
+			ConnectionUtil.CAMEL);
+
+		return ETFResponse;
+	}
+
+	public OpenApiResponse<ETFPriceRes> getETFPriceInfoWithPageAndNumOfRows(int pageNo, int pageSize) {
+
+		StringBuilder uriBuilder = new StringBuilder();
+
+		uriBuilder.append(OPEN_API_BASE_URL).append("/getETFPriceInfo")
+			.append("?").append("serviceKey=").append(OPEN_API_SERVICE_KEY)
+			.append("&").append("resultType=").append("json")
+			.append("&").append("pageSize=").append(pageSize)
+			.append("&").append("pageNo=").append(pageNo);
+
+		String response = ConnectionUtil.sendRequest(uriBuilder.toString());
+
+		TypeReference<OpenApiResponse<ETFPriceRes>> type = new TypeReference<>() {
+		};
+		OpenApiResponse<ETFPriceRes> ETFResponse = ConnectionUtil.decodeJsonStringToDto(response, type,
+			ConnectionUtil.CAMEL);
+
+		return ETFResponse;
+	}
+
 }
 
