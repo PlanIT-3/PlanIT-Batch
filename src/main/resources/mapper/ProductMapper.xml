@@ -1,28 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="woojooin.planitbatch.domain.mapper.ProductMapper">
+<mapper namespace="woojooin.planitbatch.domain.product.mapper.ProductMapper">
 
-    <select id="getProductById" parameterType="long" resultType="woojooin.planitbatch.domain.vo.Product">
-        SELECT 
-            product_id as productId,
-            invest_type as investmentType
-        FROM product 
+    <insert id="saveAll" parameterType="java.util.List">
+        INSERT INTO product (
+        shorten_code,
+        isin_code,
+        item_name,
+        base_date,
+        closing_price,
+        `difference`,
+        fluctuation_rate,
+        market_open_price,
+        high_price,
+        low_price,
+        trade_quantity,
+        trade_price,
+        market_total_amount,
+        stock_listing_count,
+        invest_type,
+        net_asset_value,
+        base_index_name,
+        base_index_closing_price,
+        net_asset_total_amount
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.shortenCode},
+            #{item.isinCode},
+            #{item.itemName},
+            #{item.baseDate},
+            #{item.closingPrice},
+            #{item.difference},
+            #{item.fluctuationRate},
+            #{item.marketOpenPrice},
+            #{item.highPrice},
+            #{item.lowPrice},
+            #{item.tradeQuantity},
+            #{item.tradePrice},
+            #{item.marketTotalAmount},
+            #{item.stockListingCount},
+            #{item.investType},
+            #{item.netAssetValue},
+            #{item.baseIndexName},
+            #{item.baseIndexClosingPrice},
+            #{item.netAssetTotalAmount}
+            )
+        </foreach>
+    </insert>
+
+    <select id="getProductById" parameterType="long" resultType="woojooin.planitbatch.domain.product.vo.Product">
+        SELECT product_id  as productId,
+               invest_type as investmentType
+        FROM product
         WHERE product_id = #{productId}
     </select>
 
-    <select id="getProductsByIds" resultType="woojooin.planitbatch.domain.vo.Product">
-        SELECT 
-            product_id as productId,
-            invest_type as investmentType
-        FROM product 
+    <select id="getProductsByIds" resultType="woojooin.planitbatch.domain.product.vo.Product">
+        SELECT
+        product_id as productId,
+        invest_type as investmentType
+        FROM product
         WHERE product_id IN
         <foreach collection="productIds" item="productId" open="(" separator="," close=")">
             #{productId}
         </foreach>
     </select>
-    <select id="findById" resultType="woojooin.planitbatch.domain.vo.Product">
-        select * from product
+    <select id="findById" resultType="woojooin.planitbatch.domain.product.vo.Product">
+        select *
+        from product
     </select>
 
 </mapper>
