@@ -102,7 +102,7 @@ public class DatabaseConfig implements BatchConfigurer {
 
 		sessionFactory.setDataSource(dataSource());
 
-		sessionFactory.setConfigLocation(new ClassPathResource("mybatis-config.xml"));
+        sessionFactory.setConfigLocation(new ClassPathResource("mybatis-config.xml"));
 		sessionFactory.setMapperLocations(
 			new PathMatchingResourcePatternResolver()
 				.getResources("classpath:mapper/*.xml")
@@ -121,14 +121,14 @@ public class DatabaseConfig implements BatchConfigurer {
 		return new DataSourceTransactionManager(batchDataSource());
 	}
 
-    @Override
-    public JobRepository getJobRepository() throws Exception {
-        JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
-        factory.setDataSource(batchDataSource());
-        factory.setTransactionManager(batchTransactionManager());
-        factory.afterPropertiesSet();
-        return factory.getObject();
-    }
+	@Override
+	public JobRepository getJobRepository() throws Exception {
+		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
+		factory.setDataSource(batchDataSource());
+		factory.setTransactionManager(batchTransactionManager());
+		factory.afterPropertiesSet();
+		return factory.getObject();
+	}
 
 	@Override
 	public PlatformTransactionManager getTransactionManager() throws Exception {
