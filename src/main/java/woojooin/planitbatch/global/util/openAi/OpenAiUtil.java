@@ -1,8 +1,5 @@
-package woojooin.planitbatch.global.openai;
+package woojooin.planitbatch.global.util.openAi;
 
-import org.springframework.stereotype.Component;
-
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.openai.client.OpenAIClient;
