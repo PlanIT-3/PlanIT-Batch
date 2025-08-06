@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
-@EnableBatchProcessing
 public class IsaTaxSavingProcessor implements ItemProcessor<UserProductQuarterData, IsaTaxSavingHistoryVo> {
 
 	private final IsaTaxSavingMapper mapper;
@@ -36,7 +35,7 @@ public class IsaTaxSavingProcessor implements ItemProcessor<UserProductQuarterDa
 
 		IsaTaxSavingHistoryVo history = new IsaTaxSavingHistoryVo();
 		history.setMemberId(memberId);
-		history.setQuarter(DateUtils.getCurrentQuarter());
+		history.setQuarter(item.getQuarter());
 		history.setSavingAmount(currentSaving);
 		history.setAccumulatedSaving(newAccumulated);
 		history.setCreatedAt(LocalDateTime.now());

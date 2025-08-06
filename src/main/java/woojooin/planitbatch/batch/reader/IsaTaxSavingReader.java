@@ -27,7 +27,6 @@ public class IsaTaxSavingReader {
 		reader.setSqlSessionFactory(sqlSessionFactory);
 		reader.setQueryId("woojooin.planitbatch.domain.mapper.IsaTaxSavingMapper.selectIsaProductProfitByMember");
 		reader.setPageSize(100);
-		reader.setParameterValues(new HashMap<>()); // 파라미터 필요 없을 경우 빈 map
 		return reader;
 	}
 }
