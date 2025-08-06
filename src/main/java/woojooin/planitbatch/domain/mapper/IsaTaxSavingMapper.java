@@ -11,9 +11,10 @@ import org.apache.ibatis.annotations.Param;
 import woojooin.planitbatch.domain.dto.UserProductQuarterData;
 import woojooin.planitbatch.domain.vo.IsaTaxSavingHistoryVo;
 
-@Mapper
 public interface IsaTaxSavingMapper {
 	List<UserProductQuarterData> selectIsaProductProfitByMember();
+
+	void insertTaxSavingHistoryBatch(@Param("list") List<IsaTaxSavingHistoryVo> histories);
 
 	void insertTaxSavingHistory(IsaTaxSavingHistoryVo history);
 
