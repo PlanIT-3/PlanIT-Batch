@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="woojooin.planitbatch.domain.mapper.MemberMapper">
+    <!-- 투자성향 비율 업데이트 -->
+    <update id="updateInvestmentRatios" parameterType="woojooin.planitbatch.domain.vo.InvestmentRatio">
+        UPDATE member
+        SET
+            stable = #{stable},
+            income = #{income},
+            liquid = #{liquid},
+            growth = #{growth},
+            diversified = #{diversified}
+        WHERE member_id = #{memberId}
+    </update>
+
+    <!-- 투자성향 비율 bulk 업데이트 -->
+    <update id="updateInvestmentRatiosBulk" parameterType="java.util.List">
+        UPDATE member
+        SET
+            stable = CASE member_id
+                <foreach collection="list" item="ratio">
+                    WHEN #{ratio.memberId} THEN #{ratio.stable}
+                </foreach>
+            END,
+            income = CASE member_id
+                <foreach collection="list" item="ratio">
+                    WHEN #{ratio.memberId} THEN #{ratio.income}
+                </foreach>
+            END,
+            liquid = CASE member_id
+                <foreach collection="list" item="ratio">
+                    WHEN #{ratio.memberId} THEN #{ratio.liquid}
+                </foreach>
+            END,
+            growth = CASE member_id
+                <foreach collection="list" item="ratio">
+                    WHEN #{ratio.memberId} THEN #{ratio.growth}
+                </foreach>
+            END,
+            diversified = CASE member_id
+                <foreach collection="list" item="ratio">
+                    WHEN #{ratio.memberId} THEN #{ratio.diversified}
+                </foreach>
+            END
+        WHERE member_id IN (
+            <foreach collection="list" item="ratio" separator=",">
+                #{ratio.memberId}
+            </foreach>
+        )
+    </update>
+
+    <select id="getMembersPaginated" parameterType="map" resultType="woojooin.planitbatch.domain.vo.Member">
+        SELECT member_id as memberId
+        FROM member
+        <if test="lastMemberId != null">
+            WHERE member_id >= #{lastMemberId}
+        </if>
+        ORDER BY member_id
+        LIMIT #{limit}
+    </select>
+
+</mapper>
