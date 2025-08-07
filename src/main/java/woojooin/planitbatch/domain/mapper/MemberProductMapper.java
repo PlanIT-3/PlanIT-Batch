@@ -10,4 +10,5 @@ import woojooin.planitbatch.domain.vo.MemberProduct;
 @Mapper
 public interface MemberProductMapper {
     List<MemberProduct> getMemberProductsByMemberIds(@Param("memberIds") List<Long> memberIds);
+    List<MemberProduct> getMemberProductsByIds(@Param("memberProductIds") List<Long> memberProductIds);
 }
