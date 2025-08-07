@@ -27,4 +27,11 @@ public class ProductRepository {
 		return productMapper.saveAll(products);
 	}
 
+	public int update(Product product) {
+		return productMapper.update(product);
+	}
+
+	public List<Product> findAll() {
+		return productMapper.findAll();
+	}
 }
