@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="woojooin.planitbatch.domain.mapper.totalInvestAmount.DailyReportMapper">
+
+    <resultMap id="DailyInvestSummaryVoResultMap" type="woojooin.planitbatch.domain.vo.DailyInvestSummaryVo">
+        <result property="memberId" column="member_id"/>
+        <result property="dailyTotal" column="daily_invest_total"/>
+        <result property="dailyCount" column="daily_invest_count"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="isDeleted" column="is_deleted"/>
+    </resultMap>
+
+    <!-- 지난주 전체 데이터 조회 (플랫 리스트) -->
+    <select id="selectDailyDataForWeek" resultMap="DailyInvestSummaryVoResultMap">
+        SELECT
+            member_id,
+            daily_invest_total,
+            daily_invest_count,
+            updated_at,
+            created_at,
+            is_deleted
+        FROM daily_report
+        WHERE DATE(updated_at) BETWEEN #{startDate} AND #{endDate}
+          AND is_deleted = 0
+          AND member_id IS NOT NULL
+          AND daily_invest_total > 0
+        ORDER BY member_id, updated_at
+    </select>
+
+    <!-- 지난주 데이터가 있는 멤버 ID 리스트 조회 (페이징) -->
+    <select id="selectMemberIdsForWeek" resultType="Long">
+        SELECT DISTINCT member_id
+        FROM daily_report
+        WHERE DATE(updated_at) BETWEEN #{startDate} AND #{endDate}
+          AND is_deleted = 0
+          AND member_id IS NOT NULL
+          AND daily_invest_total > 0
+        ORDER BY member_id
+            LIMIT #{_pagesize} OFFSET #{_skiprows}
+    </select>
+
+    <!-- 특정 멤버의 지난주 데이터 조회 -->
+    <select id="selectMemberDailyDataForWeek" resultMap="DailyInvestSummaryVoResultMap">
+        SELECT
+            member_id,
+            daily_invest_total,
+            daily_invest_count,
+            updated_at,
+            created_at,
+            is_deleted
+        FROM daily_report
+        WHERE member_id = #{memberId}
+          AND DATE(updated_at) BETWEEN #{startDate} AND #{endDate}
+          AND is_deleted = 0
+          AND daily_invest_total > 0
+        ORDER BY updated_at
+    </select>
+
+    <!-- 지난주 데이터가 있는 멤버 수 조회 -->
+    <select id="countMembersWithDataForWeek" resultType="int">
+        SELECT COUNT(DISTINCT member_id)
+        FROM daily_report
+        WHERE DATE(updated_at) BETWEEN #{startDate} AND #{endDate}
+          AND is_deleted = 0
+          AND member_id IS NOT NULL
+          AND daily_invest_total > 0
+    </select>
+
+</mapper>

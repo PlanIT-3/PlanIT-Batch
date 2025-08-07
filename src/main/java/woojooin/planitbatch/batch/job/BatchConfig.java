@@ -17,21 +17,21 @@ public class BatchConfig {
 	private JobBuilderFactory jobs;
 	@Autowired
 	private StepBuilderFactory steps;
-
-	@Bean
-	public Step sampleStep() {
-		return steps.get("sampleStep")
-			.tasklet((con, chunkCtx) -> {
-				System.out.println(">> sample step");
-				return RepeatStatus.FINISHED;
-			})
-			.build();
-	}
-
-	@Bean
-	public Job testJob() {
-		return jobs.get("testJob")
-			.start(sampleStep())
-			.build();
-	}
+//
+//	@Bean
+//	public Step sampleStep() {
+//		return steps.get("sampleStep")
+//			.tasklet((con, chunkCtx) -> {
+//				System.out.println(">> sample step");
+//				return RepeatStatus.FINISHED;
+//			})
+//			.build();
+//	}
+//
+//	@Bean
+//	public Job testJob() {
+//		return jobs.get("testJob")
+//			.start(sampleStep())
+//			.build();
+//	}
 }

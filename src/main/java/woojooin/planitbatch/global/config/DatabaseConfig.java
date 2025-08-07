@@ -98,8 +98,8 @@ public class DatabaseConfig implements BatchConfigurer {
         sessionFactory.setDataSource(dataSource());
 
         sessionFactory.setMapperLocations(
-            new PathMatchingResourcePatternResolver()
-                .getResources("classpath:mapper/*.xml")
+                new PathMatchingResourcePatternResolver()
+                        .getResources("classpath:mapper/*.xml")
         );
 
         return sessionFactory.getObject();
@@ -120,6 +120,7 @@ public class DatabaseConfig implements BatchConfigurer {
         JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
         factory.setDataSource(batchDataSource());
         factory.setTransactionManager(batchTransactionManager());
+        factory.setIsolationLevelForCreate("ISOLATION_READ_COMMITTED");
         factory.afterPropertiesSet();
         return factory.getObject();
     }
