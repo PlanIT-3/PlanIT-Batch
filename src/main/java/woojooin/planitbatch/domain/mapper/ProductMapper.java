@@ -14,5 +14,5 @@ public interface ProductMapper {
 	Product findById(long id);
 
 	@MapKey("productId")
-	Map<Long, Product> getProductsByIds(@Param("productIds") List<Long> productIds);
+	Map<String, Product> getProductsByIds(@Param("productIds") List<String> productIds);
 }
