@@ -34,4 +34,14 @@ public interface DepositMapper {
 	 * 회원 ID로 예적금 계좌 정보를 조회합니다.
 	 */
 	List<DepositVO> findByMemberId(@Param("memberId") Long memberId);
+
+	/**
+	 * UPSERT: INSERT 또는 UPDATE를 한 번에 처리 (성능 최적화)
+	 */
+	void upsertDeposit(DepositVO account);
+
+	/**
+	 * 배치 UPSERT: 여러 개의 계좌를 한 번의 쿼리로 처리 (최고 성능)
+	 */
+	void batchUpsertDeposit(List<DepositVO> accounts);
 } 

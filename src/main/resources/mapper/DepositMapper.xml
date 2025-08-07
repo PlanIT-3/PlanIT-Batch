@@ -153,4 +153,109 @@
         ORDER BY created_at DESC
     </select>
 
+    <!-- UPSERT: 한 번의 쿼리로 INSERT 또는 UPDATE 처리 -->
+    <insert id="upsertDeposit" parameterType="woojooin.planitbatch.domain.vo.DepositVO">
+        INSERT INTO account (
+            member_id,
+            account_name,
+            account_number,
+            account_currency,
+            account_balance,
+            account_deposit,
+            earnings_rate,
+            account_invested_cost,
+            last_tran_date,
+            account_start_date,
+            account_end_date,
+            is_deleted,
+            is_integrated,
+            created_at,
+            updated_at
+        ) VALUES (
+            #{memberId},
+            #{accountName},
+            #{accountNumber},
+            #{accountCurrency},
+            #{accountBalance},
+            #{accountDeposit},
+            #{earningsRate},
+            #{accountInvestedCost},
+            #{lastTranDate},
+            #{accountStartDate},
+            #{accountEndDate},
+            #{isDeleted},
+            #{isIntegrated},
+            #{createdAt},
+            #{updatedAt}
+        )
+        ON DUPLICATE KEY UPDATE
+            member_id = VALUES(member_id),
+            account_name = VALUES(account_name),
+            account_currency = VALUES(account_currency),
+            account_balance = VALUES(account_balance),
+            account_deposit = VALUES(account_deposit),
+            earnings_rate = VALUES(earnings_rate),
+            account_invested_cost = VALUES(account_invested_cost),
+            last_tran_date = VALUES(last_tran_date),
+            account_start_date = VALUES(account_start_date),
+            account_end_date = VALUES(account_end_date),
+            is_deleted = VALUES(is_deleted),
+            is_integrated = VALUES(is_integrated),
+            updated_at = VALUES(updated_at)
+    </insert>
+
+    <!-- 배치 UPSERT: 여러 개의 계좌를 한 번의 쿼리로 처리 (최고 성능) -->
+    <insert id="batchUpsertDeposit" parameterType="list">
+        INSERT INTO account (
+            member_id,
+            account_name,
+            account_number,
+            account_currency,
+            account_balance,
+            account_deposit,
+            earnings_rate,
+            account_invested_cost,
+            last_tran_date,
+            account_start_date,
+            account_end_date,
+            is_deleted,
+            is_integrated,
+            created_at,
+            updated_at
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+        (
+            #{item.memberId},
+            #{item.accountName},
+            #{item.accountNumber},
+            #{item.accountCurrency},
+            #{item.accountBalance},
+            #{item.accountDeposit},
+            #{item.earningsRate},
+            #{item.accountInvestedCost},
+            #{item.lastTranDate},
+            #{item.accountStartDate},
+            #{item.accountEndDate},
+            #{item.isDeleted},
+            #{item.isIntegrated},
+            #{item.createdAt},
+            #{item.updatedAt}
+        )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+            member_id = VALUES(member_id),
+            account_name = VALUES(account_name),
+            account_currency = VALUES(account_currency),
+            account_balance = VALUES(account_balance),
+            account_deposit = VALUES(account_deposit),
+            earnings_rate = VALUES(earnings_rate),
+            account_invested_cost = VALUES(account_invested_cost),
+            last_tran_date = VALUES(last_tran_date),
+            account_start_date = VALUES(account_start_date),
+            account_end_date = VALUES(account_end_date),
+            is_deleted = VALUES(is_deleted),
+            is_integrated = VALUES(is_integrated),
+            updated_at = VALUES(updated_at)
+    </insert>
+
 </mapper> 

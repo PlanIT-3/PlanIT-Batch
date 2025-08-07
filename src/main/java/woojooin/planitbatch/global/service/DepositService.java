@@ -56,31 +56,24 @@ public class DepositService {
 	}
 	
 	/**
-	 * 배치 처리를 위한 대량 저장 메서드 - 더 효율적인 트랜잭션 처리
+	 * 배치 처리를 위한 대량 저장 메서드 - 배치 UPSERT 방식으로 최고 성능 최적화
 	 */
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	public void saveDepositBatch(java.util.List<DepositVO> deposits) {
 		try {
-			log.info("배치 저장 시작: {} 건", deposits.size());
+			log.info("예적금 계좌 배치 저장 시작: {} 건", deposits.size());
 			
-			for (DepositVO account : deposits) {
-				// 동일한 트랜잭션 내에서 모든 계좌 처리
-				DepositVO existingAccount = depositMapper.findByAccountNumber(account.getAccountNumber());
-				
-				if (existingAccount != null) {
-					account.setAccountId(existingAccount.getAccountId());
-					depositMapper.updateDeposit(account);
-				} else {
-					depositMapper.insertDeposit(account);
-				}
-			}
+			// ✅ 최종 개선: 배치 UPSERT - 1000개를 단일 쿼리로 처리
+			// 기존: 1000개 × 2개 쿼리(SELECT + INSERT/UPDATE) = 2000개 쿼리
+			// 개선: 1000개 = 1개 배치 쿼리
+			depositMapper.batchUpsertDeposit(new java.util.ArrayList<>(deposits));
 			
-			log.info("배치 저장 완료: {} 건", deposits.size());
+			log.info("예적금 계좌 배치 저장 완료: {} 건 (배치 UPSERT 방식)", deposits.size());
 			
 		} catch (Exception e) {
-			log.error("배치 저장 중 오류 발생", e);
+			log.error("예적금 계좌 배치 저장 중 오류 발생", e);
 			// 전체 배치가 롤백됨 - 부분 성공 방지
-			throw new RuntimeException("배치 저장 실패", e);
+			throw new RuntimeException("예적금 계좌 배치 저장 실패", e);
 		}
 	}
 } 
