@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="woojooin.planitbatch.domain.mapper.DepositMapper">
+
+    <!-- 예적금 계좌 정보 ResultMap -->
+    <resultMap id="DepositResultMap" type="woojooin.planitbatch.domain.vo.DepositVO">
+        <id property="accountId" column="account_id"/>
+        <result property="memberId" column="member_id"/>
+        <result property="accountName" column="account_name"/>
+        <result property="accountNumber" column="account_number"/>
+        <result property="accountCurrency" column="account_currency"/>
+        <result property="accountBalance" column="account_balance"/>
+        <result property="accountDeposit" column="account_deposit"/>
+        <result property="earningsRate" column="earnings_rate"/>
+        <result property="accountInvestedCost" column="account_invested_cost"/>
+        <result property="lastTranDate" column="last_tran_date"/>
+        <result property="accountStartDate" column="account_start_date"/>
+        <result property="accountEndDate" column="account_end_date"/>
+        <result property="isDeleted" column="is_deleted"/>
+        <result property="isIntegrated" column="is_integrated"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- 계좌번호로 예적금 계좌 정보 조회 -->
+    <select id="findByAccountNumber" resultMap="DepositResultMap">
+        SELECT 
+            account_id,
+            member_id,
+            account_name,
+            account_number,
+            account_currency,
+            account_balance,
+            account_deposit,
+            earnings_rate,
+            account_invested_cost,
+            last_tran_date,
+            account_start_date,
+            account_end_date,
+            is_deleted,
+            is_integrated,
+            created_at,
+            updated_at
+        FROM account
+        WHERE account_number = #{accountNumber}
+        AND (is_deleted IS NULL OR is_deleted = 0)
+    </select>
+
+    <!-- 새로운 예적금 계좌 정보 삽입 -->
+    <insert id="insertDeposit" parameterType="woojooin.planitbatch.domain.vo.DepositVO" useGeneratedKeys="true" keyProperty="accountId">
+        INSERT INTO account (
+            member_id,
+            account_name,
+            account_number,
+            account_currency,
+            account_balance,
+            account_deposit,
+            earnings_rate,
+            account_invested_cost,
+            last_tran_date,
+            account_start_date,
+            account_end_date,
+            is_deleted,
+            is_integrated,
+            created_at,
+            updated_at
+        ) VALUES (
+            #{memberId},
+            #{accountName},
+            #{accountNumber},
+            #{accountCurrency},
+            #{accountBalance},
+            #{accountDeposit},
+            #{earningsRate},
+            #{accountInvestedCost},
+            #{lastTranDate},
+            #{accountStartDate},
+            #{accountEndDate},
+            #{isDeleted},
+            #{isIntegrated},
+            #{createdAt},
+            #{updatedAt}
+        )
+    </insert>
+
+    <!-- 기존 예적금 계좌 정보 업데이트 -->
+    <update id="updateDeposit" parameterType="woojooin.planitbatch.domain.vo.DepositVO">
+        UPDATE account SET
+            member_id = #{memberId},
+            account_name = #{accountName},
+            account_currency = #{accountCurrency},
+            account_balance = #{accountBalance},
+            account_deposit = #{accountDeposit},
+            earnings_rate = #{earningsRate},
+            account_invested_cost = #{accountInvestedCost},
+            last_tran_date = #{lastTranDate},
+            account_start_date = #{accountStartDate},
+            account_end_date = #{accountEndDate},
+            is_deleted = #{isDeleted},
+            is_integrated = #{isIntegrated},
+            updated_at = #{updatedAt}
+        WHERE account_id = #{accountId}
+    </update>
+
+    <!-- 모든 예적금 계좌 정보 조회 (계좌번호가 'dep'로 시작하는 것만) -->
+    <select id="findAllDeposits" resultMap="DepositResultMap">
+        SELECT 
+            account_id,
+            member_id,
+            account_name,
+            account_number,
+            account_currency,
+            account_balance,
+            account_deposit,
+            earnings_rate,
+            account_invested_cost,
+            last_tran_date,
+            account_start_date,
+            account_end_date,
+            is_deleted,
+            is_integrated,
+            created_at,
+            updated_at
+        FROM account
+        WHERE account_number LIKE 'DEP%'
+        AND (is_deleted IS NULL OR is_deleted = 0)
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 회원 ID로 예적금 계좌 정보 조회 (계좌번호가 'dep'로 시작하는 것만) -->
+    <select id="findByMemberId" resultMap="DepositResultMap">
+        SELECT 
+            account_id,
+            member_id,
+            account_name,
+            account_number,
+            account_currency,
+            account_balance,
+            account_deposit,
+            earnings_rate,
+            account_invested_cost,
+            last_tran_date,
+            account_start_date,
+            account_end_date,
+            is_deleted,
+            is_integrated,
+            created_at,
+            updated_at
+        FROM account
+        WHERE member_id = #{memberId}
+        AND account_number LIKE 'DEP%'
+        AND (is_deleted IS NULL OR is_deleted = 0)
+        ORDER BY created_at DESC
+    </select>
+
+</mapper> 
