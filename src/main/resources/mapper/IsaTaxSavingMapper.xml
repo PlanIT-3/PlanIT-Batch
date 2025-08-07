@@ -4,65 +4,46 @@
 <mapper namespace="woojooin.planitbatch.domain.mapper.IsaTaxSavingMapper">
     <!-- ISA 계좌 상품 목록을 회원별로 그룹핑해서 조회 -->
     <select id="selectIsaProductProfitByMember"
-            parameterType="map"
             resultType="woojooin.planitbatch.domain.dto.UserProductQuarterData">
 
-        SELECT mp.member_id,
-               #{quarter}                                              AS quarter,
-               SUM(p.closing_price * mp.quantity - mp.purchase_amount) AS total_profit
-        FROM member_product mp
-                 JOIN
-             (SELECT p1.*
-              FROM product p1
-                       INNER JOIN (SELECT product_id, MAX(base_date) AS latest_date
-                                   FROM product
-                                   GROUP BY product_id) p2
-                                  ON p1.product_id = p2.product_id AND p1.base_date = p2.latest_date) p
-             ON mp.product_id = p.product_id
-        WHERE p.closing_price IS NOT NULL
-          AND mp.quantity IS NOT NULL
-          AND mp.purchase_amount IS NOT NULL
-        GROUP BY mp.member_id
+        SELECT member_id                   AS memberId,
+               CONCAT(year, '-Q', quarter) AS quarter,
+               total_profit                AS totalProfit
+        FROM (SELECT mp.member_id,
+                     YEAR(p.base_date)    AS year,
+                     QUARTER(p.base_date) AS quarter,
+                     SUM(
+                             COALESCE(p.closing_price, 0) * COALESCE(mp.quantity, 0)
+                                 - COALESCE(mp.purchase_amount, 0)
+                     )                    AS total_profit
+              FROM member_product mp
+                       JOIN product p ON mp.product_id = p.shorten_code
+              WHERE p.base_date IS NOT NULL
+              GROUP BY mp.member_id, YEAR(p.base_date), QUARTER(p.base_date)) sub
+
     </select>
 
 
-    <insert id="insertTaxSavingHistoryBatch" parameterType="list">
-        INSERT INTO isa_tax_saving_history (
-        member_id,
-        quarter,
-        saving_amount,
-        accumulated_saving,
-        created_at
-        )
+    <insert id="upsertIsaTaxSavingHistory" parameterType="woojooin.planitbatch.domain.vo.IsaTaxSavingHistoryVo">
+        INSERT INTO isa_tax_saving_history (member_id, quarter, isa_profit, general_tax, tax_saved)
+        VALUES (#{memberId}, #{quarter}, #{isaProfit}, #{generalTax}, #{taxSaved})
+        ON DUPLICATE KEY UPDATE isa_profit  = VALUES(isa_profit),
+                                general_tax = VALUES(general_tax),
+                                tax_saved   = VALUES(tax_saved)
+    </insert>
+
+    <insert id="upsertIsaTaxSavingHistoryBatch" parameterType="java.util.List">
+        INSERT INTO isa_tax_saving_history (member_id, quarter, isa_profit, general_tax, tax_saved)
         VALUES
-        <foreach collection="list" item="item" separator=",">
-            (#{item.memberId}, #{item.quarter}, #{item.savingAmount}, #{item.accumulatedSaving}, #{item.createdAt})
+        <foreach collection="items" item="item" separator=",">
+            (#{item.memberId}, #{item.quarter}, #{item.isaProfit}, #{item.generalTax}, #{item.taxSaved})
         </foreach>
+        ON DUPLICATE KEY UPDATE
+        isa_profit = VALUES(isa_profit),
+        general_tax = VALUES(general_tax),
+        tax_saved = VALUES(tax_saved)
     </insert>
 
-
-    <!-- 계산한 절세 금액을 기록 -->
-    <insert id="insertTaxSavingHistory">
-        INSERT INTO isa_tax_saving_history (member_id,
-                                            quarter,
-                                            saving_amount,
-                                            accumulated_saving,
-                                            created_at)
-        VALUES (#{memberId},
-                #{quarter},
-                #{savingAmount},
-                #{accumulatedSaving},
-                NOW())
-    </insert>
-
-    <!-- 가장 최신 누적 금액 조회 -->
-    <select id="selectLatestAccumulatedSaving" resultType="java.math.BigDecimal">
-        SELECT accumulated_saving
-        FROM isa_tax_saving_history
-        WHERE member_id = #{memberId}
-        ORDER BY quarter DESC
-        LIMIT 1
-    </select>
 
 </mapper>
 

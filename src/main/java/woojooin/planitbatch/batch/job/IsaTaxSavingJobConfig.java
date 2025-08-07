@@ -21,7 +21,6 @@ import woojooin.planitbatch.domain.vo.IsaTaxSavingHistoryVo;
 
 @Configuration
 @RequiredArgsConstructor
-@EnableBatchProcessing
 public class IsaTaxSavingJobConfig {
 
 	private final JobBuilderFactory jobBuilderFactory;

@@ -2,17 +2,20 @@ package woojooin.planitbatch.global.util;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import woojooin.planitbatch.domain.vo.IsaTaxSavingHistoryVo;
 
 public class IsaTaxCalculator {
 
 	/**
-	 * ISA 계좌의 절세 효과를 계산한다.
+	 * ISA 절세 효과를 계산해서 IsaTaxSavingHistoryVo에 맞는 값을 세팅해 반환한다.
 	 *
+	 * @param memberId 회원 ID
+	 * @param quarter  분기 (예: "2024-Q1")
 	 * @param totalProfit ISA 계좌 전체 수익
-	 * @param userType "general" (일반형) 또는 "preferential" (서민형/청년형)
-	 * @return IsaTaxResult (절세 이익 + 누적 절세)
+	 * @param userType  "general" 또는 "preferential"
+	 * @return IsaTaxSavingHistoryVo (isaProfit, generalTax, taxSaved 세팅 완료)
 	 */
-	public static IsaTaxResult calculateTaxSaving(BigDecimal totalProfit, String userType) {
+	public static IsaTaxSavingHistoryVo calculateIsaTaxSavingHistoryVo(Long memberId, String quarter, BigDecimal totalProfit, String userType) {
 		BigDecimal isaLimit = userType.equalsIgnoreCase("preferential")
 			? new BigDecimal("4000000")
 			: new BigDecimal("2000000");
@@ -20,7 +23,7 @@ public class IsaTaxCalculator {
 		BigDecimal generalTaxRate = new BigDecimal("0.154"); // 일반 계좌 세율: 15.4%
 		BigDecimal isaOverLimitTaxRate = new BigDecimal("0.099"); // ISA 초과분 분리과세: 9.9%
 
-		// 일반 계좌 기준 세금
+		// 일반 계좌 기준 세금 (isaProfit * generalTaxRate)
 		BigDecimal taxIfGeneralAccount = totalProfit.multiply(generalTaxRate);
 
 		BigDecimal taxFreeAmount; // ISA 한도 내 금액
@@ -35,61 +38,16 @@ public class IsaTaxCalculator {
 			actualIsaTax = taxableExcessAmount.multiply(isaOverLimitTaxRate);
 		}
 
-		// 누적 절세 금액 = 일반 계좌 세금 - ISA 세금
+		// 절세 금액 = 일반 계좌 세금 - ISA 세금
 		BigDecimal totalTaxSaved = taxIfGeneralAccount.subtract(actualIsaTax);
 
-		return new IsaTaxResult(
-			taxFreeAmount.setScale(2, RoundingMode.DOWN),
-			taxableExcessAmount.setScale(2, RoundingMode.DOWN),
-			actualIsaTax.setScale(2, RoundingMode.DOWN),
-			totalTaxSaved.setScale(2, RoundingMode.DOWN)
-		);
-	}
+		IsaTaxSavingHistoryVo vo = new IsaTaxSavingHistoryVo();
+		vo.setMemberId(memberId);
+		vo.setQuarter(quarter);
+		vo.setIsaProfit(taxFreeAmount.setScale(0, RoundingMode.DOWN).longValue()); // 소수점 버림 후 Long 변환
+		vo.setGeneralTax(actualIsaTax.setScale(0, RoundingMode.DOWN).longValue());
+		vo.setTaxSaved(totalTaxSaved.setScale(0, RoundingMode.DOWN).longValue());
 
-	public static class IsaTaxResult {
-		private BigDecimal taxFreeAmount;           // 한도 내 비과세 금액
-		private BigDecimal taxableExcessAmount;     // 한도 초과 금액
-		private BigDecimal actualIsaTax;            // ISA에서 실제 낸 세금 (9.9%)
-		private BigDecimal totalTaxSaved;           // 일반 계좌 대비 절세 금액
-
-		public IsaTaxResult(BigDecimal taxFreeAmount, BigDecimal taxableExcessAmount,
-			BigDecimal actualIsaTax, BigDecimal totalTaxSaved) {
-			this.taxFreeAmount = taxFreeAmount;
-			this.taxableExcessAmount = taxableExcessAmount;
-			this.actualIsaTax = actualIsaTax;
-			this.totalTaxSaved = totalTaxSaved;
-		}
-
-		public BigDecimal getTaxFreeAmount() {
-			return taxFreeAmount;
-		}
-
-		public BigDecimal getTaxableExcessAmount() {
-			return taxableExcessAmount;
-		}
-
-		public BigDecimal getActualIsaTax() {
-			return actualIsaTax;
-		}
-
-		public BigDecimal getTotalTaxSaved() {
-			return totalTaxSaved;
-		}
-
-		// ISA 세금을 뺀 실제 수익
-		public BigDecimal getActualProfitAmount(){
-			BigDecimal actualAmount = taxableExcessAmount.subtract(actualIsaTax);
-			return taxFreeAmount.add(actualAmount);
-		}
-
-		@Override
-		public String toString() {
-			return "IsaTaxResult{" +
-				"taxFreeAmount=" + taxFreeAmount +
-				", taxableExcessAmount=" + taxableExcessAmount +
-				", actualIsaTax=" + actualIsaTax +
-				", totalTaxSaved=" + totalTaxSaved +
-				'}';
-		}
+		return vo;
 	}
 }

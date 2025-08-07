@@ -1,54 +1,47 @@
 package woojooin.planitbatch.batch.scheduler;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.*;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 @RequiredArgsConstructor
-@EnableBatchProcessing
-@EnableScheduling
-@Slf4j
 public class BatchScheduler {
 
 	private final JobLauncher jobLauncher;
 	private final JobExplorer jobExplorer;
 	private final Job isaTaxSavingJob;
 
-	@Scheduled(cron = "0 * * * * ?")  // 매 분 실행 (테스트용)
-	public void runIsaTaxSavingJob() throws Exception {
-		log.info("🔄 배치 job 실행 시도");
-
+	@Scheduled(cron = "0 31 10 * * *")  // 매일 2시 20분에 실행
+	public void runIsaTaxSavingJob() {
 		String jobName = isaTaxSavingJob.getName();
 
-		// 1. 최근 실행된 JobInstance 가져오기
-		long minIntervalMillis = 5 * 60 * 1000; // 5분
-		for (JobInstance instance : jobExplorer.getJobInstances(jobName, 0, 10)) {
-			for (JobExecution execution : jobExplorer.getJobExecutions(instance)) {
-				if (execution.isRunning()) {
-					log.warn("⚠️ Job '{}' si still running!!!!!!!!!, jump!!!!!!.", jobName);
-					return;
-				}
-				if (execution.getEndTime() != null) {
-					long elapsed = System.currentTimeMillis() - execution.getEndTime().getTime();
-					if (elapsed < minIntervalMillis) {
-						log.warn("⚠️ Job '{}' recently ended!!!!!!!!!! run{}s after!!!!!!!.", jobName, minIntervalMillis/1000);
-						return;
-					}
-				}
+		JobParameters jobParameters = new JobParametersBuilder()
+			.addLong("timestamp", System.currentTimeMillis()) // 매 실행마다 달라지는 값
+			.toJobParameters();
+
+		try {
+			// 현재 실행 중인 동일 Job이 있는지 확인 (jobName 기준)
+			if (!jobExplorer.findRunningJobExecutions(jobName).isEmpty()) {
+				log.warn("[스케줄러] Job '{}'이(가) 이미 실행 중입니다. 실행을 건너뜁니다.", jobName);
+				return;
 			}
+
+			log.info("[스케줄러] Job '{}' 실행을 시작합니다.", jobName);
+			JobExecution jobExecution = jobLauncher.run(isaTaxSavingJob, jobParameters);
+			log.info("[스케줄러] Job '{}' 실행 상태: {}", jobName, jobExecution.getStatus());
+
+		} catch (Exception e) {
+			log.error("[스케줄러] Job '{}' 실행 중 예외가 발생했습니다.", jobName, e);
 		}
-
-
-		// 2. 실행
-		jobLauncher.run(isaTaxSavingJob, new JobParametersBuilder()
-			.addLong("time", System.currentTimeMillis()) // 항상 다른 파라미터로 실행
-			.toJobParameters());
 	}
 }
