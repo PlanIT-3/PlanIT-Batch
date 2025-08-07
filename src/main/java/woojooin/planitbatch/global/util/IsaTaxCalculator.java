@@ -44,8 +44,8 @@ public class IsaTaxCalculator {
 		IsaTaxSavingHistoryVo vo = new IsaTaxSavingHistoryVo();
 		vo.setMemberId(memberId);
 		vo.setQuarter(quarter);
-		vo.setIsaProfit(taxFreeAmount.setScale(0, RoundingMode.DOWN).longValue()); // 소수점 버림 후 Long 변환
-		vo.setGeneralTax(actualIsaTax.setScale(0, RoundingMode.DOWN).longValue());
+		vo.setIsaProfit(totalProfit.setScale(0, RoundingMode.DOWN).longValue()); // 소수점 버림 후 Long 변환
+		vo.setGeneralTax(taxIfGeneralAccount.setScale(0, RoundingMode.DOWN).longValue());
 		vo.setTaxSaved(totalTaxSaved.setScale(0, RoundingMode.DOWN).longValue());
 
 		return vo;
