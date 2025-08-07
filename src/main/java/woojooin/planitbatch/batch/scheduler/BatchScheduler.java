@@ -21,7 +21,7 @@ public class BatchScheduler {
 	private final JobExplorer jobExplorer;
 	private final Job isaTaxSavingJob;
 
-	@Scheduled(cron = "0 31 10 * * *")  // 매일 2시 20분에 실행
+	@Scheduled(cron = "0 13 11 * * *")  // 매일 2시 20분에 실행
 	public void runIsaTaxSavingJob() {
 		String jobName = isaTaxSavingJob.getName();
 
