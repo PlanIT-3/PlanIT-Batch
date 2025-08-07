@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="woojooin.planitbatch.domain.mapper.AccountMapper">
+    <select id="getAccountsByAccountIds"
+            parameterType="java.util.List"
+            resultType="woojooin.planitbatch.domain.vo.Account">
+        SELECT
+        account_id AS accountId,
+        member_id AS memberId,
+        account_balance AS accountBalance
+        FROM account
+        WHERE account_id IN
+        <foreach collection="accountIds" item="accountId" open="(" separator="," close=")">
+            #{accountId}
+        </foreach>
+        AND (is_deleted = false OR is_deleted IS NULL)
+    </select>
+</mapper>
