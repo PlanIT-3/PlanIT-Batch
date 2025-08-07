@@ -9,7 +9,7 @@ import woojooin.planitbatch.domain.product.enums.InvestType;
 @Data
 public class Product {
 
-	private Long productId;
+	private String productId;
 
 	/** 상품코드 */
 	private String productIdentifier;
