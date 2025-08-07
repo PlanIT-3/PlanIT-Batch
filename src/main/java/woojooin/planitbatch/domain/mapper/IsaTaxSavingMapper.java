@@ -14,9 +14,8 @@ import woojooin.planitbatch.domain.vo.IsaTaxSavingHistoryVo;
 public interface IsaTaxSavingMapper {
 	List<UserProductQuarterData> selectIsaProductProfitByMember();
 
-	void insertTaxSavingHistoryBatch(@Param("list") List<IsaTaxSavingHistoryVo> histories);
+	int upsertIsaTaxSavingHistory(IsaTaxSavingHistoryVo vo);
 
-	void insertTaxSavingHistory(IsaTaxSavingHistoryVo history);
+	int upsertIsaTaxSavingHistoryBatch(@Param("items") List<IsaTaxSavingHistoryVo> items);
 
-	BigDecimal selectLatestAccumulatedSaving(@Param("memberId") Long memberId);
 }

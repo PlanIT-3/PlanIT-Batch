@@ -12,10 +12,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import woojooin.planitbatch.domain.dto.UserProductQuarterData;
 
 @Configuration
 @RequiredArgsConstructor
+@Slf4j
 public class IsaTaxSavingReader {
 
 	private final SqlSessionFactory sqlSessionFactory;
@@ -23,6 +25,8 @@ public class IsaTaxSavingReader {
 	@Bean(name = "isaTaxReader")
 	@StepScope
 	public MyBatisPagingItemReader<UserProductQuarterData> isaTaxReader() {
+		log.info("reader!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
 		MyBatisPagingItemReader<UserProductQuarterData> reader = new MyBatisPagingItemReader<>();
 		reader.setSqlSessionFactory(sqlSessionFactory);
 		reader.setQueryId("woojooin.planitbatch.domain.mapper.IsaTaxSavingMapper.selectIsaProductProfitByMember");
