@@ -21,7 +21,7 @@ public class CalculateInvestmentRatioScheduler {
     private JobLauncher jobLauncher;
 
     @Autowired
-    @Qualifier("investmentRatioJob")
+    @Qualifier("memberInvestmentRatioJob")
     private Job investmentRatioJob;
 
     @Scheduled(cron = "0 44 15 * * ?")
