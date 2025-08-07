@@ -2,6 +2,47 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="woojooin.planitbatch.domain.product.mapper.ProductMapper">
+    <insert id="save"
+            parameterType="woojooin.planitbatch.domain.product.vo.Product">
+        INSERT INTO product (shorten_code,
+                             isin_code,
+                             item_name,
+                             base_date,
+                             closing_price,
+                             `difference`,
+                             fluctuation_rate,
+                             net_asset_value,
+                             market_open_price,
+                             high_price,
+                             low_price,
+                             trade_quantity,
+                             trade_price,
+                             market_total_amount,
+                             stock_listing_count,
+                             invest_type,
+                             base_index_name,
+                             base_index_closing_price,
+                             net_asset_total_amount)
+        VALUES (#{shortenCode},
+                #{isinCode},
+                #{itemName},
+                #{baseDate},
+                #{closingPrice},
+                #{difference},
+                #{fluctuationRate},
+                #{netAssetValue},
+                #{marketOpenPrice},
+                #{highPrice},
+                #{lowPrice},
+                #{tradeQuantity},
+                #{tradePrice},
+                #{marketTotalAmount},
+                #{stockListingCount},
+                #{investType},
+                #{baseIndexName},
+                #{baseIndexClosingPrice},
+                #{netAssetTotalAmount})
+    </insert>
 
     <insert id="saveAll" parameterType="java.util.List">
         INSERT INTO product (
@@ -73,4 +114,33 @@
         from product
     </select>
 
+    <update id="update"
+            parameterType="woojooin.planitbatch.domain.product.vo.Product">
+        UPDATE product
+        SET isin_code                = #{isinCode},
+            item_name                = #{itemName},
+            base_date                = #{baseDate},
+            closing_price            = #{closingPrice},
+            `difference`             = #{difference},
+            fluctuation_rate         = #{fluctuationRate},
+            net_asset_value          = #{netAssetValue},
+            market_open_price        = #{marketOpenPrice},
+            high_price               = #{highPrice},
+            low_price                = #{lowPrice},
+            trade_quantity           = #{tradeQuantity},
+            trade_price              = #{tradePrice},
+            market_total_amount      = #{marketTotalAmount},
+            stock_listing_count      = #{stockListingCount},
+            invest_type              = #{investType},
+            base_index_name          = #{baseIndexName},
+            base_index_closing_price = #{baseIndexClosingPrice},
+            net_asset_total_amount   = #{netAssetTotalAmount}
+        WHERE shorten_code = #{shortenCode}
+    </update>
+
+    <select id="findAll"
+            resultType="woojooin.planitbatch.domain.product.vo.Product">
+        SELECT *
+        FROM product
+    </select>
 </mapper>

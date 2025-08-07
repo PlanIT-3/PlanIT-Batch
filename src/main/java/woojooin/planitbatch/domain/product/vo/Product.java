@@ -6,11 +6,13 @@ import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import woojooin.planitbatch.domain.product.enums.InvestType;
 
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class Product {
 	private String shortenCode;               // 단축코드
 	private InvestType investType;          // 투자 성향
