@@ -37,7 +37,7 @@ public class CalculateInvestmentRatioProcessor implements ItemProcessor<List<Mem
         List<MemberProduct> allMemberProducts =
             MemberProductMapper.getMemberProductsByMemberIds(memberIds); // IN 절을 통해 MemberProduct 데이터 조회
 
-        Map<Long, Product> product = getProduct(allMemberProducts); // memberProduct를 통해 Product 데이터 조회
+        Map<String, Product> product = getProduct(allMemberProducts); // memberProduct를 통해 Product 데이터 조회
 
         Map<Long, List<MemberProduct>> memberProductMap =
             allMemberProducts.stream()
@@ -50,8 +50,8 @@ public class CalculateInvestmentRatioProcessor implements ItemProcessor<List<Mem
             .collect(Collectors.toList());
     }
 
-    private Map<Long, Product> getProduct(List<MemberProduct> allMemberProducts) {
-        List<Long> productIds = allMemberProducts.stream()
+    private Map<String, Product> getProduct(List<MemberProduct> allMemberProducts) {
+        List<String> productIds = allMemberProducts.stream()
             .map(MemberProduct::getProductId)
             .distinct()
             .collect(Collectors.toList()); // MemberProduct 테이블에 productId가 중복으로 존재할테니 중복 제거 후 List 반환
@@ -60,12 +60,12 @@ public class CalculateInvestmentRatioProcessor implements ItemProcessor<List<Mem
             return new HashMap<>();
         }
 
-        Map<Long, Product> productMap = productMapper.getProductsByIds(productIds); // productId를 IN절을 이용하여 Product 데이터 조회
+        Map<String, Product> productMap = productMapper.getProductsByIds(productIds); // productId를 IN절을 이용하여 Product 데이터 조회
 
         return productMap;
     }
 
-    private InvestmentRatio calculateRatio(Long memberId, List<MemberProduct> memberProducts, Map<Long, Product> products) {
+    private InvestmentRatio calculateRatio(Long memberId, List<MemberProduct> memberProducts, Map<String, Product> products) {
         log.info("=== Member {} 계산 시작 ===", memberId);
 
         if (memberProducts == null || memberProducts.isEmpty()) {
