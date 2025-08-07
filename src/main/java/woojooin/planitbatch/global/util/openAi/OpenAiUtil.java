@@ -32,10 +32,16 @@ public class OpenAiUtil {
 		return "response";
 	}
 
-	public String basicChat() {
+	/**
+	 * o3-mini 모델 기반 gpt user, assistant 메세지 통신 메서드
+	 * @param userMessage
+	 * @param assistantMessage
+	 * @return
+	 */
+	public String basicChat(String userMessage, String assistantMessage) {
 		ChatCompletionCreateParams params = ChatCompletionCreateParams.builder()
-			.addAssistantMessage("test assistant message")
-			.addUserMessage("Say this is a test")
+			.addAssistantMessage(assistantMessage)
+			.addUserMessage(userMessage)
 			.model(ChatModel.O3_MINI)
 			.build();
 
