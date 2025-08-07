@@ -79,8 +79,8 @@ public class ConnectionUtil {
 			URL url = new URL(uri);
 			connection = (HttpURLConnection)url.openConnection();
 			connection.setRequestMethod(HttpMethod.GET.name());
-			connection.setConnectTimeout(10000);
-			connection.setReadTimeout(10000);
+			connection.setConnectTimeout(100000);
+			connection.setReadTimeout(100000);
 
 			int responseCode = connection.getResponseCode();
 
@@ -101,6 +101,7 @@ public class ConnectionUtil {
 
 		} catch (IOException e) {
 			log.error("HttpURLConnection 요청 중 예외 발생", e);
+			//Todo: exception 만들기
 			return null;
 		} finally {
 			if (reader != null) {
