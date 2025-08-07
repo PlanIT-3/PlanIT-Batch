@@ -17,7 +17,7 @@ public class GoalReader implements ItemReader<List<Goal>> {
 
     private final GoalMapper goalMapper;
     private static final int CHUNK_SIZE = 500;
-    private Long lastObjectId = null;
+    private Long lastGoalId = null;
     private boolean hasMoreData = true;
 
     public GoalReader(GoalMapper goalMapper) {
@@ -33,8 +33,8 @@ public class GoalReader implements ItemReader<List<Goal>> {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("limit", CHUNK_SIZE);
-            if (lastObjectId != null) {
-                params.put("lastObjectId", lastObjectId);
+            if (lastGoalId != null) {
+                params.put("lastGoalId", lastGoalId);
             }
 
             List<Goal> goals = goalMapper.getGoalsPaginated(params);
@@ -47,13 +47,13 @@ public class GoalReader implements ItemReader<List<Goal>> {
             }
 
             if (!goals.isEmpty()) {
-                lastObjectId = goals.get(goals.size() - 1).getObjectId().longValue();
-                log.info("GoalReader - 마지막 조회된 objectId: {}", lastObjectId);
+                lastGoalId = goals.get(goals.size() - 1).getGoalId().longValue();
+                log.info("GoalReader - 마지막 조회된 objectId: {}", lastGoalId);
             } else {
                 log.warn("GoalReader - 조회된 데이터가 없습니다.");
             }
 
-            log.debug("조회된 Goal 수: {}, 마지막 objectId: {}", goals.size(), lastObjectId);
+            log.debug("조회된 Goal 수: {}, 마지막 objectId: {}", goals.size(), lastGoalId);
 
             return goals.isEmpty() ? null : goals;
 

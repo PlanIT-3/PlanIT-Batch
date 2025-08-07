@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Goal {
-    private Long objectId;
+    private Long goalId;
     private Long memberId;
     private BigInteger targetAmount;
     private Integer depositRate;
