@@ -25,7 +25,7 @@ public class GoalProgressScheduler {
     @Qualifier("dailyGoalProgressJob")
     private Job goalProgressJob;
 
-    @Scheduled(cron = "0 30 9 * * ?")
+    @Scheduled(cron = "0 37 10 * * ?")
     public void runGoalProgressJob() {
         try {
             log.info("목표 진행률 계산 배치 작업 시작");
@@ -33,7 +33,6 @@ public class GoalProgressScheduler {
             String dateParam = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
             JobParameters jobParameters = new JobParametersBuilder()
                 .addString("date", dateParam)
-                .addLong("timestamp", System.currentTimeMillis()) // 고유성을 위한 timestamp 추가
                 .toJobParameters();
             
             jobLauncher.run(goalProgressJob, jobParameters);
