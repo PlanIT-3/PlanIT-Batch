@@ -121,14 +121,14 @@ public class DatabaseConfig implements BatchConfigurer {
 		return new DataSourceTransactionManager(batchDataSource());
 	}
 
-	@Override
-	public JobRepository getJobRepository() throws Exception {
-		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
-		factory.setDataSource(batchDataSource());
-		factory.setTransactionManager(batchTransactionManager());
-		factory.afterPropertiesSet();
-		return factory.getObject();
-	}
+    @Override
+    public JobRepository getJobRepository() throws Exception {
+        JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
+        factory.setDataSource(batchDataSource());
+        factory.setTransactionManager(batchTransactionManager());
+        factory.afterPropertiesSet();
+        return factory.getObject();
+    }
 
 	@Override
 	public PlatformTransactionManager getTransactionManager() throws Exception {

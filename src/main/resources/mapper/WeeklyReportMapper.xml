@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="woojooin.planitbatch.domain.mapper.totalInvestAmount.WeeklyReportMapper">
+
+    <!-- WeeklyInvestSummaryVo ResultMap -->
+    <resultMap id="WeeklyInvestSummaryVoResultMap" type="woojooin.planitbatch.domain.vo.totalInvestAmountVo.WeeklyInvestSummaryVo">
+        <result property="memberId" column="member_id"/>
+        <result property="weeklyTotalAmount" column="weekly_total_amount"/>
+        <result property="weeklyTotalCount" column="weekly_total_count"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="isDeleted" column="is_deleted"/>
+    </resultMap>
+
+    <!-- 지난달 전체 주간 데이터 조회 (플랫 리스트) -->
+    <select id="selectWeeklyDataForMonth" resultMap="WeeklyInvestSummaryVoResultMap">
+        SELECT
+            member_id,
+            weekly_total_amount,
+            weekly_total_count,
+            created_at,
+            updated_at,
+            is_deleted
+        FROM weekly_report
+        WHERE DATE(created_at) BETWEEN #{startDate} AND #{endDate}
+          AND is_deleted = 0
+          AND member_id IS NOT NULL
+          AND weekly_total_amount > 0
+        ORDER BY member_id, created_at
+    </select>
+
+    <!-- 지난달 주간 데이터가 있는 멤버 ID 리스트 조회 (페이징) -->
+    <select id="selectMemberIdsForMonth" resultType="Long">
+        SELECT DISTINCT member_id
+        FROM weekly_report
+        WHERE DATE(created_at) BETWEEN #{startDate} AND #{endDate}
+          AND is_deleted = 0
+          AND member_id IS NOT NULL
+          AND weekly_total_amount > 0
+        ORDER BY member_id
+            LIMIT #{_pagesize} OFFSET #{_skiprows}
+    </select>
+
+    <!-- 특정 멤버의 지난달 주간 데이터 조회 -->
+    <select id="selectMemberWeeklyDataForMonth" resultMap="WeeklyInvestSummaryVoResultMap">
+        SELECT
+            member_id,
+            weekly_total_amount,
+            weekly_total_count,
+            created_at,
+            updated_at,
+            is_deleted
+        FROM weekly_report
+        WHERE member_id = #{memberId}
+          AND DATE(created_at) BETWEEN #{startDate} AND #{endDate}
+          AND is_deleted = 0
+          AND weekly_total_amount > 0
+        ORDER BY created_at
+    </select>
+
+    <!-- 지난달 주간 데이터가 있는 멤버 수 조회 -->
+    <select id="countMembersWithDataForMonth" resultType="int">
+        SELECT COUNT(DISTINCT member_id)
+        FROM weekly_report
+        WHERE DATE(created_at) BETWEEN #{startDate} AND #{endDate}
+          AND is_deleted = 0
+          AND member_id IS NOT NULL
+          AND weekly_total_amount > 0
+    </select>
+
+</mapper>

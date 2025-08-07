@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="woojooin.planitbatch.domain.mapper.totalInvestAmount.WeeklyInvestSummaryMapper">
+
+    <!-- WeeklyInvestSummaryVo ResultMap -->
+    <resultMap id="WeeklyInvestSummaryVoResultMap" type="woojooin.planitbatch.domain.vo.totalInvestAmountVo.WeeklyInvestSummaryVo">
+        <result property="memberId" column="member_id"/>
+        <result property="weeklyTotalAmount" column="weekly_total_amount"/>
+        <result property="weeklyTotalCount" column="weekly_total_count"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="isDeleted" column="is_deleted"/>
+    </resultMap>
+
+    <!-- 주간 투자 집계 데이터 INSERT -->
+    <insert id="insert" parameterType="woojooin.planitbatch.domain.vo.totalInvestAmountVo.WeeklyInvestSummaryVo">
+        INSERT INTO weekly_report (
+        member_id,
+        weekly_total_amount,
+        weekly_total_count,
+        created_at,
+        updated_at,
+        is_deleted
+        ) VALUES (
+        #{memberId},
+        #{weeklyTotalAmount},
+        #{weeklyTotalCount},
+        <choose>
+            <when test="createdAt != null">
+                #{createdAt}
+            </when>
+            <otherwise>
+                CURRENT_TIMESTAMP
+            </otherwise>
+        </choose>,
+        <choose>
+            <when test="updatedAt != null">
+                #{updatedAt}
+            </when>
+            <otherwise>
+                CURRENT_TIMESTAMP
+            </otherwise>
+        </choose>,
+        #{isDeleted}
+        )
+    </insert>
+
+    <!-- Batch INSERT (성능 최적화용) -->
+    <insert id="batchInsert">
+        INSERT INTO weekly_report (
+        member_id,
+        weekly_total_amount,
+        weekly_total_count,
+        created_at,
+        updated_at,
+        is_deleted
+        ) VALUES
+        <foreach collection="collection" item="item" separator=",">
+            (
+            #{item.memberId},
+            #{item.weeklyTotalAmount},
+            #{item.weeklyTotalCount},
+            #{item.createdAt},
+            #{item.updatedAt},
+            #{item.isDeleted}
+            )
+        </foreach>
+    </insert>
+
+
+</mapper>
