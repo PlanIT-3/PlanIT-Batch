@@ -1,0 +1,20 @@
+package woojooin.planitbatch.domain.product.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import woojooin.planitbatch.domain.product.vo.EtfDailyHistory;
+
+@Mapper
+public interface EtfDailyHistoryMapper {
+	EtfDailyHistory findById(long id);
+
+	int save(EtfDailyHistory etfDailyHistory);
+
+	int saveAll(List<EtfDailyHistory> etfDailyHistories);
+
+	int update(EtfDailyHistory etfDailyHistory);
+
+	List<EtfDailyHistory> findAll();
+}
