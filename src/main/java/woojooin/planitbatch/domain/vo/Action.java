@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Action {
     private Long actionId;
-    private Long objectId;
+    private Long goalId;
     private Long accountId;
     private Long memberProductId;
     private Integer allocatedRate;

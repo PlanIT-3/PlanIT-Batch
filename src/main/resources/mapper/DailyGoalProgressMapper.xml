@@ -3,10 +3,10 @@
 
 <mapper namespace="woojooin.planitbatch.domain.mapper.DailyGoalProgressMapper">
     <insert id="insertDailyGoalProgressBatch" parameterType="java.util.List">
-        INSERT INTO daily_goal_progress (object_id, isa_progress, deposit_progress, progress_date, created_at)
+        INSERT INTO daily_goal_progress (goal_id, isa_progress, deposit_progress, progress_date, created_at)
         VALUES
         <foreach collection="list" item="item" separator=",">
-            (#{item.objectId}, #{item.isaProgress}, #{item.depositProgress}, #{item.progressDate}, NOW())
+            (#{item.goalId}, #{item.isaProgress}, #{item.depositProgress}, #{item.progressDate}, NOW())
         </foreach>
     </insert>
 </mapper>
