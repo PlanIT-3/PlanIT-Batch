@@ -5,11 +5,11 @@
 
 <configuration>
     <settings>
-        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <setting name="mapUnderscoreToCamelCase" value="true" />
     </settings>
 
     <typeAliases>
-        <package name="woojooin.planit.domain.member.domain"/>
+        <package name="woojooin.planitbatch.domain.vo" />
     </typeAliases>
 
     <typeHandlers>
