@@ -69,6 +69,6 @@
             AND mp.quantity > 0
         ORDER BY m.member_id, mp.updated_at
     </select>
-    
+
 
 </mapper>
