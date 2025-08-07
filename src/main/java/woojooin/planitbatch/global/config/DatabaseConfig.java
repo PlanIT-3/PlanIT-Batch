@@ -8,6 +8,8 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.batch.core.configuration.annotation.BatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -27,7 +29,6 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
-@EnableBatchProcessing
 @PropertySource("classpath:application.properties")
 @MapperScan("woojooin.planitbatch.domain.mapper")
 public class DatabaseConfig implements BatchConfigurer {
@@ -64,15 +65,32 @@ public class DatabaseConfig implements BatchConfigurer {
         config.setJdbcUrl(url);
         config.setUsername(username);
         config.setPassword(password);
-        config.setMaximumPoolSize(10);
-
-        config.setConnectionTimeout(20000);
-        config.setIdleTimeout(300000);
-        config.setMaxLifetime(1200000);
-        config.setLeakDetectionThreshold(15000);
+        
+        // 기존 애플리케이션 DB 풀 설정 (성능 최적화)
+        config.setMaximumPoolSize(8);        // 최대 8개 연결로 증가
+        config.setMinimumIdle(2);            // 최소 2개 연결 유지
+        config.setConnectionTimeout(10000);  // 연결 대기 시간 10초
+        config.setIdleTimeout(600000);       // 10분 후 유휴 연결 해제
+        config.setMaxLifetime(1800000);      // 30분 후 연결 갱신
+        config.setLeakDetectionThreshold(60000); // 1분 후 연결 누수 탐지
+        
+        // 연결 검증 설정
+        config.setValidationTimeout(5000);
+        config.setConnectionTestQuery("SELECT 1");
+        
+        // 풀 이름 설정
+        config.setPoolName("PlanIT-Main-CP");
+        
+        // HikariCP 모니터링 및 로깅 강화
+        config.setRegisterMbeans(true);           // JMX 모니터링 활성화
+        
+        // 추가 안정성 설정
+        config.setInitializationFailTimeout(30000);  // 초기화 실패 타임아웃 30초
+        config.setConnectionInitSql("SELECT 1");     // 커넥션 초기화 SQL
 
         return new HikariDataSource(config);
     }
+
 
     @Bean("batchDataSource")
     public DataSource batchDataSource() {
@@ -81,12 +99,21 @@ public class DatabaseConfig implements BatchConfigurer {
         config.setJdbcUrl(batchUrl);
         config.setUsername(batchUsername);
         config.setPassword(batchPassword);
-        config.setMaximumPoolSize(5);
-
-        config.setConnectionTimeout(20000);
-        config.setIdleTimeout(300000);
-        config.setMaxLifetime(1200000);
-        config.setLeakDetectionThreshold(15000);
+        
+        // 배치 메타데이터 DB 풀 설정 (최적화된 작은 풀 크기)
+        config.setMaximumPoolSize(3);        // 최대 3개 연결로 제한
+        config.setMinimumIdle(1);            // 최소 1개 연결 유지
+        config.setConnectionTimeout(10000);  // 연결 대기 시간 10초
+        config.setIdleTimeout(600000);       // 10분 후 유휴 연결 해제
+        config.setMaxLifetime(1800000);      // 30분 후 연결 갱신
+        config.setLeakDetectionThreshold(60000); // 1분 후 연결 누수 탐지
+        
+        // 연결 검증 설정
+        config.setValidationTimeout(5000);
+        config.setConnectionTestQuery("SELECT 1");
+        
+        // 풀 이름 설정
+        config.setPoolName("PlanIT-Batch-CP");
 
         return new HikariDataSource(config);
     }

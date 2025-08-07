@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="woojooin.planitbatch.domain.mapper.DepositCalculationMapper">
+
+    <!-- 계산 결과 ResultMap -->
+    <resultMap id="DepositCalculationResultMap" type="woojooin.planitbatch.domain.vo.DepositCalculationVO">
+        <id property="calculationId" column="calculation_id"/>
+        <result property="accountId" column="account_id"/>
+        <result property="interestAmount" column="interest_amount"/>
+        <result property="taxAmount" column="tax_amount"/>
+        <result property="netInterestAmount" column="net_interest_amount"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <!-- 계산 결과 저장 -->
+    <insert id="insertCalculation" parameterType="woojooin.planitbatch.domain.vo.DepositCalculationVO" 
+            useGeneratedKeys="true" keyProperty="calculationId">
+        INSERT INTO deposit_calculation (
+            account_id,
+            interest_amount,
+            tax_amount,
+            net_interest_amount,
+            created_at
+        ) VALUES (
+            #{accountId},
+            #{interestAmount},
+            #{taxAmount},
+            #{netInterestAmount},
+            #{createdAt}
+        )
+    </insert>
+
+    <!-- 여러 계산 결과 배치 저장 -->
+    <insert id="insertCalculations" parameterType="java.util.List">
+        INSERT INTO deposit_calculation (
+            account_id,
+            interest_amount,
+            tax_amount,
+            net_interest_amount,
+            created_at
+        ) VALUES
+        <foreach collection="calculations" item="calc" separator=",">
+            (
+                #{calc.accountId},
+                #{calc.interestAmount},
+                #{calc.taxAmount},
+                #{calc.netInterestAmount},
+                #{calc.createdAt}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 특정 계좌의 계산 이력 조회 -->
+    <select id="findByAccountId" resultMap="DepositCalculationResultMap">
+        SELECT 
+            calculation_id,
+            account_id,
+            interest_amount,
+            tax_amount,
+            net_interest_amount,
+            created_at
+        FROM deposit_calculation
+        WHERE account_id = #{accountId}
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 특정 날짜의 모든 계산 결과 조회 -->
+    <select id="findByDate" resultMap="DepositCalculationResultMap">
+        SELECT 
+            calculation_id,
+            account_id,
+            interest_amount,
+            tax_amount,
+            net_interest_amount,
+            created_at
+        FROM deposit_calculation
+        WHERE DATE(created_at) = DATE(#{date})
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 최근 N개의 계산 결과 조회 -->
+    <select id="findRecentCalculations" resultMap="DepositCalculationResultMap">
+        SELECT 
+            calculation_id,
+            account_id,
+            interest_amount,
+            tax_amount,
+            net_interest_amount,
+            created_at
+        FROM deposit_calculation
+        ORDER BY created_at DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 특정 계좌의 최근 계산 결과 조회 -->
+    <select id="findLatestByAccountId" resultMap="DepositCalculationResultMap">
+        SELECT 
+            calculation_id,
+            account_id,
+            interest_amount,
+            tax_amount,
+            net_interest_amount,
+            created_at
+        FROM deposit_calculation
+        WHERE account_id = #{accountId}
+        ORDER BY created_at DESC
+        LIMIT 1
+    </select>
+
+</mapper>

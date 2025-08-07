@@ -11,23 +11,40 @@
     </appender>
 
     <!-- Application Loggers -->
-    <logger name="org.scoula">
-        <level value="info" />
+    <logger name="woojooin.planitbatch">
+        <level value="debug" />
     </logger>
 
-    <!-- 3rdparty Loggers -->
+    <!-- Spring Framework Loggers -->
     <logger name="org.springframework.core">
         <level value="info" />
     </logger>
     <logger name="org.springframework.beans">
         <level value="info" />
     </logger>
-
     <logger name="org.springframework.context">
         <level value="info" />
     </logger>
-
     <logger name="org.springframework.web">
+        <level value="info" />
+    </logger>
+    
+    <!-- Spring Batch Loggers -->
+    <logger name="org.springframework.batch">
+        <level value="info" />
+    </logger>
+    <logger name="org.springframework.batch.core.job">
+        <level value="debug" />
+    </logger>
+    <logger name="org.springframework.batch.core.step">
+        <level value="debug" />
+    </logger>
+    
+    <!-- Database Loggers -->
+    <logger name="org.mybatis">
+        <level value="debug" />
+    </logger>
+    <logger name="com.zaxxer.hikari">
         <level value="info" />
     </logger>
 
