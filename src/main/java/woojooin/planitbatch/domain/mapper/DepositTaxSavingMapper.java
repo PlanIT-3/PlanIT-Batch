@@ -41,6 +41,16 @@ public interface DepositTaxSavingMapper {
     void updateDepositTaxSaving(DepositTaxSavingVO depositTaxSaving);
 
     /**
+     * UPSERT: INSERT 또는 UPDATE를 한 번에 처리 (성능 최적화)
+     */
+    void upsertDepositTaxSaving(DepositTaxSavingVO depositTaxSaving);
+
+    /**
+     * 배치 UPSERT: 여러 개의 데이터를 한 번의 쿼리로 처리 (최고 성능)
+     */
+    void batchUpsertDepositTaxSaving(List<DepositTaxSavingVO> depositTaxSavings);
+
+    /**
      * 중복 데이터가 있는지 확인합니다.
      */
     int countByMemberIdAndAccountIdAndQuarter(@Param("memberId") Long memberId, 

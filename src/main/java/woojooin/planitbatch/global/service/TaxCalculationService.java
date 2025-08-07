@@ -46,26 +46,19 @@ public class TaxCalculationService {
 	}
 	
 	/**
-	 * 배치 처리를 위한 대량 저장 메서드 - 더 효율적인 트랜잭션 처리
+	 * 배치 처리를 위한 대량 저장 메서드 - 배치 UPSERT 방식으로 최고 성능 최적화
 	 */
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	public void saveTaxCalculationBatch(java.util.List<DepositTaxSavingVO> taxSavings) {
 		try {
 			log.info("세금 절약 내역 배치 저장 시작: {} 건", taxSavings.size());
 			
-			for (DepositTaxSavingVO taxSaving : taxSavings) {
-				// 동일한 트랜잭션 내에서 모든 세금 계산 처리
-				int existCount = depositTaxSavingMapper.countByMemberIdAndAccountIdAndQuarter(
-					taxSaving.getMemberId(), taxSaving.getAccountId(), taxSaving.getQuarter());
-				
-				if (existCount == 0) {
-					depositTaxSavingMapper.insertDepositTaxSaving(taxSaving);
-				} else {
-					depositTaxSavingMapper.updateDepositTaxSaving(taxSaving);
-				}
-			}
+			// ✅ 최종 개선: 배치 UPSERT - 1000개를 단일 쿼리로 처리
+			// 기존: 1000개 × 1개 쿼리 = 1000개 쿼리
+			// 개선: 1000개 = 1개 배치 쿼리
+			depositTaxSavingMapper.batchUpsertDepositTaxSaving(new java.util.ArrayList<>(taxSavings));
 			
-			log.info("세금 절약 내역 배치 저장 완료: {} 건", taxSavings.size());
+			log.info("세금 절약 내역 배치 저장 완료: {} 건 (배치 UPSERT 방식)", taxSavings.size());
 			
 		} catch (Exception e) {
 			log.error("세금 절약 내역 배치 저장 중 오류 발생", e);

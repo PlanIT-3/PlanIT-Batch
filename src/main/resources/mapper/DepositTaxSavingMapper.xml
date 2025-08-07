@@ -41,6 +41,73 @@
         )
     </insert>
 
+    <!-- UPSERT: 한 번의 쿼리로 INSERT 또는 UPDATE 처리 -->
+    <insert id="upsertDepositTaxSaving" parameterType="woojooin.planitbatch.domain.vo.DepositTaxSavingVO">
+        INSERT INTO deposit_tax_saving_history (
+            member_id,
+            account_id,
+            quarter,
+            interest_income,
+            income_tax,
+            local_income_tax,
+            total_tax,
+            net_income,
+            created_at
+        ) VALUES (
+            #{memberId},
+            #{accountId},
+            #{quarter},
+            #{interestIncome},
+            #{incomeTax},
+            #{localIncomeTax},
+            #{totalTax},
+            #{netIncome},
+            #{createdAt}
+        )
+        ON DUPLICATE KEY UPDATE
+            interest_income = VALUES(interest_income),
+            income_tax = VALUES(income_tax),
+            local_income_tax = VALUES(local_income_tax),
+            total_tax = VALUES(total_tax),
+            net_income = VALUES(net_income),
+            created_at = VALUES(created_at)
+    </insert>
+
+    <!-- 배치 UPSERT: 여러 개의 데이터를 한 번의 쿼리로 처리 (최고 성능) -->
+    <insert id="batchUpsertDepositTaxSaving" parameterType="list">
+        INSERT INTO deposit_tax_saving_history (
+            member_id,
+            account_id,
+            quarter,
+            interest_income,
+            income_tax,
+            local_income_tax,
+            total_tax,
+            net_income,
+            created_at
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+        (
+            #{item.memberId},
+            #{item.accountId},
+            #{item.quarter},
+            #{item.interestIncome},
+            #{item.incomeTax},
+            #{item.localIncomeTax},
+            #{item.totalTax},
+            #{item.netIncome},
+            #{item.createdAt}
+        )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+            interest_income = VALUES(interest_income),
+            income_tax = VALUES(income_tax),
+            local_income_tax = VALUES(local_income_tax),
+            total_tax = VALUES(total_tax),
+            net_income = VALUES(net_income),
+            created_at = VALUES(created_at)
+    </insert>
+
     <!-- 회원별 예적금 세금 절약 내역 조회 -->
     <select id="findByMemberId" resultMap="DepositTaxSavingResultMap">
         SELECT 
@@ -121,8 +188,11 @@
             income_tax = #{incomeTax},
             local_income_tax = #{localIncomeTax},
             total_tax = #{totalTax},
-            net_income = #{netIncome}
-        WHERE id = #{id}
+            net_income = #{netIncome},
+            created_at = #{createdAt}
+        WHERE member_id = #{memberId} 
+          AND account_id = #{accountId} 
+          AND quarter = #{quarter}
     </update>
 
     <!-- 중복 데이터 개수 확인 -->
