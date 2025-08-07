@@ -17,8 +17,6 @@ import woojooin.planitbatch.global.util.IsaTaxCalculator;
 public class IsaTaxSavingProcessor implements ItemProcessor<UserProductQuarterData, IsaTaxSavingHistoryVo> {
 	@Override
 	public IsaTaxSavingHistoryVo process(UserProductQuarterData item) throws Exception {
-		log.info("processor!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-		log.info("data!!!!!!!!!!!!!!!!!: {}", item);
 		Long memberId = item.getMemberId();
 		String quarter = item.getQuarter();
 		// "general" 타입 고정, 필요시 변경 가능

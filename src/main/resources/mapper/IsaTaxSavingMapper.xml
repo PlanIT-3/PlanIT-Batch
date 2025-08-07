@@ -32,19 +32,6 @@
                                 tax_saved   = VALUES(tax_saved)
     </insert>
 
-    <insert id="upsertIsaTaxSavingHistoryBatch" parameterType="java.util.List">
-        INSERT INTO isa_tax_saving_history (member_id, quarter, isa_profit, general_tax, tax_saved)
-        VALUES
-        <foreach collection="items" item="item" separator=",">
-            (#{item.memberId}, #{item.quarter}, #{item.isaProfit}, #{item.generalTax}, #{item.taxSaved})
-        </foreach>
-        ON DUPLICATE KEY UPDATE
-        isa_profit = VALUES(isa_profit),
-        general_tax = VALUES(general_tax),
-        tax_saved = VALUES(tax_saved)
-    </insert>
-
-
 </mapper>
 
 
