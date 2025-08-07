@@ -40,12 +40,12 @@ public class GoalProgressProcessor implements ItemProcessor<List<Goal>, List<Dai
         log.info("GoalProgressProcessor - 처리할 Goal 데이터 수: {}", goals.size());
 
         List<Long> goalObjectIds = goals.stream()
-            .map(Goal::getObjectId)
+            .map(Goal::getGoalId)
             .collect(Collectors.toList());
         
         log.info("GoalProgressProcessor - Goal ObjectId 목록: {}", goalObjectIds);
 
-        List<Action> allActions = actionMapper.getActionsByObjectIds(goalObjectIds);
+        List<Action> allActions = actionMapper.getActionsByGoalIds(goalObjectIds);
         log.info("GoalProgressProcessor - 조회된 Action 데이터 수: {}", allActions.size());
 
         List<Long> allMemberProductIds = allActions.stream()
@@ -78,9 +78,9 @@ public class GoalProgressProcessor implements ItemProcessor<List<Goal>, List<Dai
                 progressList.add(dailyProgress);
                 
                 log.debug("목표 ID: {}, ISA 진행률: {}, 예적금 진행률: {}", 
-                    goal.getObjectId(), dailyProgress.getIsaProgress(), dailyProgress.getDepositProgress());
+                    goal.getGoalId(), dailyProgress.getIsaProgress(), dailyProgress.getDepositProgress());
             } catch (Exception e) {
-                log.error("목표 ID {}의 진행률 계산 실패: {}", goal.getObjectId(), e.getMessage());
+                log.error("목표 ID {}의 진행률 계산 실패: {}", goal.getGoalId(), e.getMessage());
             }
         }
 
@@ -92,7 +92,7 @@ public class GoalProgressProcessor implements ItemProcessor<List<Goal>, List<Dai
                                                    List<Account> allAccounts) {
         
         List<Action> goalActions = allActions.stream()
-            .filter(action -> goal.getObjectId().equals(action.getObjectId()))
+            .filter(action -> goal.getGoalId().equals(action.getGoalId()))
             .collect(Collectors.toList()); // 특정 목적에 할당한 Action 리스트들
 
         List<Long> memberProductIds = goalActions.stream()
@@ -139,6 +139,6 @@ public class GoalProgressProcessor implements ItemProcessor<List<Goal>, List<Dai
             
             depositProgress = currentDepositAmount.divide(depositTargetAmount, 4, RoundingMode.HALF_UP).doubleValue();
         }
-        return new DailyGoalProgress(goal.getObjectId(), isaProgress, depositProgress, progressDate, null, null);
+        return new DailyGoalProgress(goal.getGoalId(), isaProgress, depositProgress, progressDate, null, null);
     }
 }

@@ -4,7 +4,7 @@
 <mapper namespace="woojooin.planitbatch.domain.mapper.GoalMapper">
     <select id="getGoalsPaginated" parameterType="java.util.Map" resultType="woojooin.planitbatch.domain.vo.Goal">
         SELECT 
-            object_id as objectId,
+            goal_id as goalId,
             member_id as memberId,
             target_amount as targetAmount,
             deposit_rate as depositRate,
@@ -12,10 +12,10 @@
             goal_rate as goalRate
         FROM goal
         WHERE end_date >= CURDATE()
-        <if test="lastObjectId != null">
-            AND object_id > #{lastObjectId}
+        <if test="lastGoalId != null">
+            AND goal_id > #{lastGoalId}
         </if>
-        ORDER BY object_id ASC
+        ORDER BY goal_id ASC
         LIMIT #{limit}
     </select>
 </mapper>

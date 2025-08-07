@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DailyGoalProgress {
-	private Long objectId;
+	private Long goalId;
 	private Double isaProgress;
 	private Double depositProgress;
 	private LocalDate progressDate;
