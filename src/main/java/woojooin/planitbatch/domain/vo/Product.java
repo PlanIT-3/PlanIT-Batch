@@ -4,11 +4,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import lombok.Data;
+import woojooin.planitbatch.domain.product.enums.InvestType;
 
 @Data
 public class Product {
 
-	private String productId;
+	private Long productId;
 
 	/** 상품코드 */
 	private String productIdentifier;
@@ -56,5 +57,5 @@ public class Product {
 	private BigDecimal marketCapitalization;
 
 	/** 투자유형 */
-	private String investmentType;
+	private InvestType investmentType;
 }
