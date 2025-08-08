@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -101,7 +102,7 @@ public class DatabaseConfig implements BatchConfigurer {
             new PathMatchingResourcePatternResolver()
                 .getResources("classpath:mapper/*.xml")
         );
-
+        sessionFactory.setConfigLocation(new ClassPathResource("mybatis-config.xml"));
         return sessionFactory.getObject();
     }
 
@@ -120,6 +121,7 @@ public class DatabaseConfig implements BatchConfigurer {
         JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
         factory.setDataSource(batchDataSource());
         factory.setTransactionManager(batchTransactionManager());
+        factory.setIsolationLevelForCreate("ISOLATION_READ_COMMITTED");
         factory.afterPropertiesSet();
         return factory.getObject();
     }

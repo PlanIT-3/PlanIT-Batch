@@ -7,11 +7,24 @@
         SELECT
             mp.member_id AS memberId,
             mp.product_id AS itemCode,
-            p.bas_dt AS returnDate,
-            CAST(p.clpr AS DECIMAL(20,2)) * mp.quantity AS amount
+            p.base_date AS returnDate,
+            sum(CAST(p.closing_price AS DECIMAL(20,2)) * mp.quantity )AS amount
         FROM member_product mp
-                 JOIN product p ON mp.product_id COLLATE utf8mb4_unicode_ci = p.isin_cd COLLATE utf8mb4_unicode_ci
-        WHERE DATE(p.bas_dt) = #{date}
+        JOIN product p ON mp.product_id COLLATE utf8mb4_unicode_ci = p.shorten_code COLLATE utf8mb4_unicode_ci
+        WHERE DATE(p.base_date) = #{date}
+        GROUP BY mp.member_id, mp.product_id, p.base_date
+    </select>
+
+    <select id="findpast" resultType="woojooin.planitbatch.domain.vo.DailyReturn">
+        select
+            mp.member_id AS memberId,
+            mp.product_id AS itemCode,
+            edh.base_date AS returnDate,
+            CAST(edh.closing_price AS DECIMAL(20, 2))* mp.quantity AS amount
+        from etf_daily_history edh
+            join member_product mp ON mp.product_id = edh.shorten_code
+        WHERE edh.base_date BETWEEN #{startDate} AND #{endDate}
+        ORDER BY edh.base_date, mp.member_id
     </select>
 
 

@@ -1,4 +1,4 @@
-package woojooin.planitbatch.batch.job;
+package woojooin.planitbatch.batch.job.investreturn;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 //import woojooin.planitbatch.batch.reader.DailyReturnReader;
 import woojooin.planitbatch.batch.writer.DailyReturnWriter;
-import woojooin.planitbatch.domain.mapper.DailyReturnMapper;
 import woojooin.planitbatch.domain.vo.DailyReturn;
 import org.springframework.beans.factory.annotation.Value;
 import java.time.LocalDate;
@@ -27,10 +26,8 @@ public class DailyReturnBatchJob {
 
     private final JobBuilderFactory jobs;
     private final StepBuilderFactory steps;
-//    private final DailyReturnReader dailyReturnReader;
     private final DailyReturnWriter writer;
     private final SqlSessionFactory sqlSessionFactory;
-
 
     @Bean
     @StepScope

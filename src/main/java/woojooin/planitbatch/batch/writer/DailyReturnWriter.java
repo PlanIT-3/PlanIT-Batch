@@ -1,6 +1,7 @@
 package woojooin.planitbatch.batch.writer;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -11,6 +12,7 @@ import woojooin.planitbatch.domain.vo.DailyReturn;
 
 import java.util.List;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DailyReturnWriter implements ItemWriter<DailyReturn> {
@@ -18,8 +20,16 @@ public class DailyReturnWriter implements ItemWriter<DailyReturn> {
 
     @Override
     public void write(List<? extends DailyReturn> items) {
+        log.info("▶ Writer 실행됨. item 수: {}", items.size());
+        if (items.isEmpty()) {
+            log.warn("▶ Writer로 전달된 데이터 없음");
+            return;
+        }
+
         try (SqlSession session = sqlSessionFactory.openSession(ExecutorType.BATCH)) {
+            log.info("write = {}", items);
             for (DailyReturn item : items) {
+
                 session.insert("woojooin.planitbatch.domain.mapper.DailyReturnMapper.insert", item);
             }
             session.flushStatements();
