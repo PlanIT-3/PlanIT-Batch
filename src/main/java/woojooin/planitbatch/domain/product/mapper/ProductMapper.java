@@ -26,4 +26,9 @@ public interface ProductMapper {
 	Map<String, Product> getProductsByShortenCodes(@Param("productIds") List<String> productIds);
 
 	Product getHighestDifferenceProductByInvestType(@Param("investType") InvestType investType);
+
+	List<Product> findPage(@Param("offset") int offset,
+		@Param("limit") int limit);
+
+	int countAll();
 }

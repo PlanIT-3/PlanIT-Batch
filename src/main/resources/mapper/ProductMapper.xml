@@ -93,8 +93,8 @@
     </insert>
 
     <select id="getProductById" parameterType="long" resultType="woojooin.planitbatch.domain.product.vo.Product">
-        SELECT shorten_code  as productId,
-               invest_type as investType
+        SELECT shorten_code as productId,
+               invest_type  as investType
         FROM product
         WHERE shorten_code = #{productId}
     </select>
@@ -113,6 +113,20 @@
         select *
         from product
     </select>
+
+    <select id="findPage" resultType="woojooin.planitbatch.domain.product.vo.Product">
+        SELECT *
+        FROM product
+        ORDER BY shorten_code
+            LIMIT #{limit}
+        OFFSET #{offset}
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*)
+        FROM product
+    </select>
+
 
     <update id="update"
             parameterType="woojooin.planitbatch.domain.product.vo.Product">
@@ -134,7 +148,8 @@
             invest_type              = #{investType},
             base_index_name          = #{baseIndexName},
             base_index_closing_price = #{baseIndexClosingPrice},
-            net_asset_total_amount   = #{netAssetTotalAmount}
+            net_asset_total_amount   = #{netAssetTotalAmount},
+            expected_return_rate     = ${expectedReturnRate}
         WHERE shorten_code = #{shortenCode}
     </update>
 
