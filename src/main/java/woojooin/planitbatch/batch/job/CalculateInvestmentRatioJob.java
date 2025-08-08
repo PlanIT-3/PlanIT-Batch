@@ -6,10 +6,11 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import lombok.RequiredArgsConstructor;
 import woojooin.planitbatch.batch.listener.JobExecutionTimeListener;
 import woojooin.planitbatch.batch.processor.CalculateInvestmentRatioProcessor;
 import woojooin.planitbatch.batch.reader.MemberReader;
@@ -18,29 +19,38 @@ import woojooin.planitbatch.domain.vo.InvestmentRatio;
 import woojooin.planitbatch.domain.vo.Member;
 
 @Configuration
-@RequiredArgsConstructor
 public class CalculateInvestmentRatioJob {
 
-    private final JobBuilderFactory jobBuilderFactory;
-    private final StepBuilderFactory stepBuilderFactory;
+    @Autowired
+    private JobBuilderFactory jobBuilderFactory;
 
-    private final MemberReader memberReader;
-    private final CalculateInvestmentRatioProcessor calculateInvestmentRatioProcessor;
-    private final InvestmentRatioWriter investmentRatioWriter;
-    private final JobExecutionTimeListener jobExecutionTimeListener;
+    @Autowired
+    private StepBuilderFactory stepBuilderFactory;
 
+    @Autowired
+    private MemberReader memberReader;
 
-    @Bean
-    public Job investmentRatioJob() {
-        return jobBuilderFactory.get("investmentRatioJob")
+    @Autowired
+    private CalculateInvestmentRatioProcessor calculateInvestmentRatioProcessor;
+
+    @Autowired
+    private InvestmentRatioWriter investmentRatioWriter;
+
+    @Autowired
+    private JobExecutionTimeListener jobExecutionTimeListener;
+
+    @Bean("memberInvestmentRatioJob")  // Bean 이름 변경
+    public Job createInvestmentRatioJob() {
+        return jobBuilderFactory.get("investmentRatioJob")  // 내부 Job 이름은 유지
             .listener(jobExecutionTimeListener)
-            .start(investmentRatioStep())
+            .start(createInvestmentRatioStep())
+            .incrementer(new RunIdIncrementer())
             .build();
     }
 
-    @Bean
-    public Step investmentRatioStep() {
-        return stepBuilderFactory.get("investmentRatioStep")
+    @Bean("memberInvestmentRatioStep")  // Bean 이름 변경
+    public Step createInvestmentRatioStep() {
+        return stepBuilderFactory.get("investmentRatioStep")  // 내부 Step 이름은 유지
             .<List<Member>, List<InvestmentRatio>>chunk(1)
             .reader(memberReader)
             .processor(calculateInvestmentRatioProcessor)

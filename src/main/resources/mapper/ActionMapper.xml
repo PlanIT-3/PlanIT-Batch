@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="woojooin.planitbatch.domain.mapper.ActionMapper">
+    <select id="getActionsByGoalId" parameterType="java.math.BigInteger" resultType="woojooin.planitbatch.domain.vo.Action">
+        SELECT 
+            action_id as actionId,
+            goal_id as goalId,
+            member_product_id as memberProductId,
+            allocated_rate as allocatedRate,
+            account_allocated_rate as accountAllocatedRate,
+            amount,
+            action_type as actionType,
+            is_deleted as isDeleted
+        FROM action
+        WHERE goal_id = #{goalId}
+        AND (is_deleted = false OR is_deleted IS NULL)
+    </select>
+
+    <select id="getActionsByGoalIds" resultType="woojooin.planitbatch.domain.vo.Action">
+        SELECT 
+            action_id as actionId,
+            goal_id as goalId,
+            account_id as accountId,
+            member_product_id as memberProductId,
+            allocated_rate as allocatedRate,
+            account_allocated_rate as accountAllocatedRate,
+            account_type as accountType,
+            amount,
+            is_deleted as isDeleted
+        FROM action
+        WHERE goal_id IN
+        <foreach collection="goalIds" item="goalId" open="(" separator="," close=")">
+            #{goalId}
+        </foreach>
+        AND (is_deleted = false OR is_deleted IS NULL)
+    </select>
+</mapper>

@@ -10,5 +10,7 @@ import lombok.NoArgsConstructor;
 public class MemberProduct {
     private Long memberProductId;
     private Long memberId;
-    private Long productId;
+    private String shortenCode;
+    private Double presentAmount;
+    private Long quantity;
 }
