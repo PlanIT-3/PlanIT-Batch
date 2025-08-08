@@ -7,8 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberProduct {
-    private Long memberProductId;
+public class Member {
     private Long memberId;
-    private Long productId;
+    private Double stable;
+    private Double income;
+    private Double liquid;
+    private Double growth;
+    private Double diversified;
 }
