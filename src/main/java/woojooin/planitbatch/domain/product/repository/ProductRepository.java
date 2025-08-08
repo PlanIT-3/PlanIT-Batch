@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import woojooin.planitbatch.domain.product.enums.InvestType;
 import woojooin.planitbatch.domain.product.mapper.ProductMapper;
 import woojooin.planitbatch.domain.product.vo.Product;
 
@@ -33,5 +34,9 @@ public class ProductRepository {
 
 	public List<Product> findAll() {
 		return productMapper.findAll();
+	}
+
+	public Optional<Product> getHighestDifferenceProductByInvestType(InvestType investType) {
+		return Optional.ofNullable(productMapper.getHighestDifferenceProductByInvestType(investType));
 	}
 }

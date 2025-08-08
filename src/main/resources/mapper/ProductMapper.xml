@@ -143,4 +143,15 @@
         SELECT *
         FROM product
     </select>
+
+    <!-- 투자 성향별 가장 높은 difference를 가진 단일 Product 조회 -->
+    <select id="getHighestDifferenceProductByInvestType"
+            parameterType="woojooin.planitbatch.domain.product.enums.InvestType"
+            resultType="woojooin.planitbatch.domain.product.vo.Product">
+        SELECT *
+        FROM product
+        WHERE invest_type = #{investType}
+        ORDER BY `difference` DESC LIMIT 1
+    </select>
+
 </mapper>
