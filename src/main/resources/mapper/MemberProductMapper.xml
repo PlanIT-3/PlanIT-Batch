@@ -7,7 +7,7 @@
         SELECT
             member_product_id as memberProductId,
             member_id as memberId,
-            product_id as productId,
+            product_id as shortenCode,
             present_amount as presentAmount,
             quantity
         FROM member_product

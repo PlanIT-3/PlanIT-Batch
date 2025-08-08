@@ -36,7 +36,6 @@ public class CalculateInvestmentRatioProcessor implements ItemProcessor<List<Mem
 
         List<MemberProduct> allMemberProducts =
             MemberProductMapper.getMemberProductsByMemberIds(memberIds); // IN 절을 통해 MemberProduct 데이터 조회
-
         Map<String, Product> product = getProduct(allMemberProducts); // memberProduct를 통해 Product 데이터 조회
 
         Map<Long, List<MemberProduct>> memberProductMap =
@@ -51,16 +50,16 @@ public class CalculateInvestmentRatioProcessor implements ItemProcessor<List<Mem
     }
 
     private Map<String, Product> getProduct(List<MemberProduct> allMemberProducts) {
-        List<String> productIds = allMemberProducts.stream()
-            .map(MemberProduct::getProductId)
+        List<String> shortenCodes = allMemberProducts.stream()
+            .map(MemberProduct::getShortenCode)
             .distinct()
             .collect(Collectors.toList()); // MemberProduct 테이블에 productId가 중복으로 존재할테니 중복 제거 후 List 반환
 
-        if (productIds.isEmpty()) {
+        if (shortenCodes.isEmpty()) {
             return new HashMap<>();
         }
 
-        Map<String, Product> productMap = productMapper.getProductsByIds(productIds); // productId를 IN절을 이용하여 Product 데이터 조회
+        Map<String, Product> productMap = productMapper.getProductsByShortenCodes(shortenCodes); // productId를 IN절을 이용하여 Product 데이터 조회
 
         return productMap;
     }
@@ -73,13 +72,10 @@ public class CalculateInvestmentRatioProcessor implements ItemProcessor<List<Mem
             return createEmptyRatio(memberId);
         }
 
-        log.info("Member {} - memberProducts 개수: {}", memberId, memberProducts.size());
-
         // 투자성향별 상품 개수 계산
         Map<String, Long> investTypeCounts = memberProducts.stream()
             .map(mp -> {
-                Product product = products.get(mp.getProductId());
-                log.info("ProductId: {} -> Product: {}", mp.getProductId(), product);
+                Product product = products.get(mp.getShortenCode());
                 return product;
             })
             .filter(product -> {
@@ -92,7 +88,6 @@ public class CalculateInvestmentRatioProcessor implements ItemProcessor<List<Mem
             .collect(Collectors.groupingBy(
                 product -> {
                     String investType = product.getInvestType().toString();
-                    log.info("투자 타입: {}", investType);
                     return investType;
                 },
                 Collectors.counting()

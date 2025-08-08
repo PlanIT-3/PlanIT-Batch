@@ -93,18 +93,18 @@
     </insert>
 
     <select id="getProductById" parameterType="long" resultType="woojooin.planitbatch.domain.product.vo.Product">
-        SELECT product_id  as productId,
-               invest_type as investmentType
+        SELECT shorten_code  as productId,
+               invest_type as investType
         FROM product
-        WHERE product_id = #{productId}
+        WHERE shorten_code = #{productId}
     </select>
 
-    <select id="getProductsByIds" resultType="woojooin.planitbatch.domain.product.vo.Product">
+    <select id="getProductsByShortenCodes" resultType="woojooin.planitbatch.domain.product.vo.Product">
         SELECT
-        product_id as productId,
-        invest_type as investmentType
+        shorten_code as shortenCode,
+        invest_type as investType
         FROM product
-        WHERE product_id IN
+        WHERE shorten_code IN
         <foreach collection="productIds" item="productId" open="(" separator="," close=")">
             #{productId}
         </foreach>
