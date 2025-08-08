@@ -16,4 +16,19 @@
         </foreach>
         AND (is_deleted = false OR is_deleted IS NULL)
     </select>
+    
+    <select id="getTotalBalanceByMemberIds" 
+            parameterType="java.util.List"
+            resultType="woojooin.planitbatch.domain.vo.MemberBalance">
+        SELECT 
+            member_id as memberId,
+            COALESCE(SUM(account_balance), 0) as value
+        FROM account
+        WHERE member_id IN
+        <foreach collection="memberIds" item="memberId" open="(" separator="," close=")">
+            #{memberId}
+        </foreach>
+        AND (is_deleted = false OR is_deleted IS NULL)
+        GROUP BY member_id
+    </select>
 </mapper>
