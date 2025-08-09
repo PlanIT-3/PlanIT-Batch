@@ -21,40 +21,40 @@ import woojooin.planitbatch.domain.vo.Member;
 @Configuration
 public class CalculateInvestmentRatioJob {
 
-    @Autowired
-    private JobBuilderFactory jobBuilderFactory;
+	@Autowired
+	private JobBuilderFactory jobBuilderFactory;
 
-    @Autowired
-    private StepBuilderFactory stepBuilderFactory;
+	@Autowired
+	private StepBuilderFactory stepBuilderFactory;
 
-    @Autowired
-    private MemberReader memberReader;
+	@Autowired
+	private MemberReader memberReader;
 
-    @Autowired
-    private CalculateInvestmentRatioProcessor calculateInvestmentRatioProcessor;
+	@Autowired
+	private CalculateInvestmentRatioProcessor calculateInvestmentRatioProcessor;
 
-    @Autowired
-    private InvestmentRatioWriter investmentRatioWriter;
+	@Autowired
+	private InvestmentRatioWriter investmentRatioWriter;
 
-    @Autowired
-    private JobExecutionTimeListener jobExecutionTimeListener;
+	@Autowired
+	private JobExecutionTimeListener jobExecutionTimeListener;
 
-    @Bean("memberInvestmentRatioJob")  // Bean 이름 변경
-    public Job createInvestmentRatioJob() {
-        return jobBuilderFactory.get("investmentRatioJob")  // 내부 Job 이름은 유지
-            .listener(jobExecutionTimeListener)
-            .start(createInvestmentRatioStep())
-            .incrementer(new RunIdIncrementer())
-            .build();
-    }
+	@Bean("memberInvestmentRatioJob")  // Bean 이름 변경
+	public Job createInvestmentRatioJob() {
+		return jobBuilderFactory.get("investmentRatioJob")  // 내부 Job 이름은 유지
+			.listener(jobExecutionTimeListener)
+			.start(createInvestmentRatioStep())
+			.incrementer(new RunIdIncrementer())
+			.build();
+	}
 
-    @Bean("memberInvestmentRatioStep")  // Bean 이름 변경
-    public Step createInvestmentRatioStep() {
-        return stepBuilderFactory.get("investmentRatioStep")  // 내부 Step 이름은 유지
-            .<List<Member>, List<InvestmentRatio>>chunk(1)
-            .reader(memberReader)
-            .processor(calculateInvestmentRatioProcessor)
-            .writer(investmentRatioWriter)
-            .build();
-    }
+	@Bean("memberInvestmentRatioStep")  // Bean 이름 변경
+	public Step createInvestmentRatioStep() {
+		return stepBuilderFactory.get("investmentRatioStep")  // 내부 Step 이름은 유지
+			.<List<Member>, List<InvestmentRatio>>chunk(1)
+			.reader(memberReader)
+			.processor(calculateInvestmentRatioProcessor)
+			.writer(investmentRatioWriter)
+			.build();
+	}
 }

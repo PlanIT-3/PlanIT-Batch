@@ -11,9 +11,9 @@ import woojooin.planitbatch.domain.vo.Member;
 @Mapper
 public interface MemberMapper {
 
-    void updateInvestmentRatios(InvestmentRatio ratios);
-    
-    void updateInvestmentRatiosBulk(List<InvestmentRatio> ratioList);
-    
-    List<Member> getMembersPaginated(Map<String, Object> params);
+	void updateInvestmentRatios(InvestmentRatio ratios);
+
+	void updateInvestmentRatiosBulk(List<InvestmentRatio> ratioList);
+
+	List<Member> getMembersPaginated(Map<String, Object> params);
 }
