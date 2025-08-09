@@ -1,5 +1,6 @@
 package woojooin.planitbatch.domain.product.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
@@ -16,5 +17,9 @@ public class EtfDailyHistoryRepository {
 
 	public int saveAll(List<EtfDailyHistory> etfDailyHistories) {
 		return etfDailyHistoryMapper.saveAll(etfDailyHistories);
+	}
+
+	public List<EtfDailyHistory> findByProductAfterStart(String shortenCode, LocalDate startDate) {
+		return etfDailyHistoryMapper.findByProductAfterStart(shortenCode, startDate);
 	}
 }

@@ -33,4 +33,5 @@ public class Product {
 	private String baseIndexName;           // 기초지수명
 	private BigDecimal baseIndexClosingPrice; // 기초지수 종가
 	private Long netAssetTotalAmount;       // 순자산총액
+	private BigDecimal expectedReturnRate;
 }
