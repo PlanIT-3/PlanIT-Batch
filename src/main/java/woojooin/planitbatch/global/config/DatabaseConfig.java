@@ -30,7 +30,8 @@ import com.zaxxer.hikari.HikariDataSource;
 @Configuration
 @EnableBatchProcessing
 @PropertySource("classpath:application.properties")
-@MapperScan(basePackages = {"woojooin.planitbatch.domain.mapper", "woojooin.planitbatch.domain.product.mapper"})
+@MapperScan(basePackages = {"woojooin.planitbatch.domain.mapper", "woojooin.planitbatch.domain.product.mapper",
+	"woojooin.planitbatch.domain.rebalance.mapper"})
 public class DatabaseConfig implements BatchConfigurer {
 
 	@Value("${jdbc.driver}")
