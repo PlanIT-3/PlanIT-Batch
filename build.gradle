@@ -70,6 +70,8 @@ dependencies {
     testImplementation "org.springframework:spring-test:${springVersion}"
     testImplementation "org.springframework.batch:spring-batch-test:${springBatchVersion}"
 
+    //Firebase
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
 
     // OpenAI
     implementation("com.openai:openai-java:${openAiVersion}")
