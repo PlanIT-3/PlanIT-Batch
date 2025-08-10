@@ -13,6 +13,7 @@ import java.sql.Timestamp;
 public class MonthlyInvestSummaryVo {
     private Long memberId;
     private BigDecimal monthlyTotalAmount;
+    private BigDecimal monthlyValuationTotal;
     private int monthlyTotalCount;
     private Timestamp updatedAt;
     private Timestamp createdAt;

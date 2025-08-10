@@ -22,6 +22,7 @@ public interface ProductMapper {
 
 	List<Product> findAll();
 
+<<<<<<< HEAD
 	@MapKey("shortenCode")
 	Map<String, Product> getProductsByShortenCodes(@Param("productIds") List<String> productIds);
 
@@ -31,4 +32,8 @@ public interface ProductMapper {
 		@Param("limit") int limit);
 
 	int countAll();
+=======
+	@MapKey("productId")
+	Map<String, Product> getProductsByIds(@Param("productIds") List<String> productIds);
+>>>>>>> ef6542d (feat: 배치에 평가금액 추가)
 }
