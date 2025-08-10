@@ -7,6 +7,9 @@ import lombok.Data;
 
 @Data
 public class Product {
+
+	private String productId;
+
 	/** 상품코드 */
 	private String productIdentifier;
 

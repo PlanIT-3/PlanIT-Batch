@@ -7,7 +7,9 @@
         SELECT
             member_product_id as memberProductId,
             member_id as memberId,
-            product_id as productId
+            product_id as productId,
+            present_amount as presentAmount,
+            quantity
         FROM member_product
         WHERE member_id IN
         <foreach collection="memberIds" item="memberId" open="(" close=")" separator=",">
@@ -52,6 +54,20 @@
             AND mp.purchase_amount > 0
             AND mp.quantity > 0
         ORDER BY m.member_id, mp.updated_at
+    </select>
+    
+    <select id="getMemberProductsByIds" resultType="woojooin.planitbatch.domain.vo.MemberProduct">
+        SELECT 
+            member_product_id as memberProductId,
+            member_id as memberId,
+            product_id as productId,
+            present_amount as presentAmount,
+            quantity
+        FROM member_product
+        WHERE member_product_id IN
+        <foreach collection="memberProductIds" item="memberProductId" open="(" separator="," close=")">
+            #{memberProductId}
+        </foreach>
     </select>
     
 </mapper>
