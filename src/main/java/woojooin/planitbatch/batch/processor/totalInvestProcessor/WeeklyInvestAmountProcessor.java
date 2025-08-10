@@ -35,6 +35,7 @@ public class WeeklyInvestAmountProcessor implements ItemProcessor<List<DailyInve
         }
 
         BigDecimal weeklyTotalAmount = BigDecimal.ZERO;
+        BigDecimal weeklyValuationTotal = BigDecimal.ZERO;
         int weeklyTotalCount = 0;
         int dailyDataCount = 0;
 
@@ -48,6 +49,7 @@ public class WeeklyInvestAmountProcessor implements ItemProcessor<List<DailyInve
             }
 
             weeklyTotalAmount = weeklyTotalAmount.add(dailyData.getDailyTotal());
+            weeklyValuationTotal = weeklyValuationTotal.add(dailyData.getDailyValuationTotal());
             weeklyTotalCount += dailyData.getDailyCount();
             dailyDataCount++;
         }
@@ -61,7 +63,7 @@ public class WeeklyInvestAmountProcessor implements ItemProcessor<List<DailyInve
         weeklyMemberSummary.setMemberId(memberId);
         weeklyMemberSummary.setWeeklyTotalAmount(weeklyTotalAmount);
         weeklyMemberSummary.setWeeklyTotalCount(weeklyTotalCount);
-
+        weeklyMemberSummary.setWeeklyValuationTotal(weeklyValuationTotal);
 
         Timestamp currentTime = new Timestamp(System.currentTimeMillis());
         weeklyMemberSummary.setCreatedAt(currentTime);

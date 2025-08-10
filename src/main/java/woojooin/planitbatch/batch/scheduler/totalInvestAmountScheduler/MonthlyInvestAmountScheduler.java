@@ -23,8 +23,9 @@ public class MonthlyInvestAmountScheduler {
     @Qualifier("monthlyInvestJob")
     private Job monthlyInvestJob;
 
-    @Scheduled(cron = "0 0 0 1 * ?")// 매월 1일 자정에 실행
-    public void runMonthlyInvestmentJob() {
+//    @Scheduled(cron = "0 0 0 1 * ?")// 매월 1일 자정에 실행
+@Scheduled(cron = "0 */2 * * * ?") // 테스트용, 2분마다 실행
+public void runMonthlyInvestmentJob() {
         try {
             log.info("월간 투자금액 계산 배치 작업 시작");
             String targetDate = LocalDate.now().minusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));

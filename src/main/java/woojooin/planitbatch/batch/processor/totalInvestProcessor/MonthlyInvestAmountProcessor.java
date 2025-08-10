@@ -30,6 +30,7 @@ public class MonthlyInvestAmountProcessor implements ItemProcessor<List<WeeklyIn
 
 
         BigDecimal monthlyTotalAmount = BigDecimal.ZERO;
+        BigDecimal monthlyValuationTotal = BigDecimal.ZERO;
         int monthlyTotalCount = 0;
         int weeklyDataCount = 0;
 
@@ -45,6 +46,7 @@ public class MonthlyInvestAmountProcessor implements ItemProcessor<List<WeeklyIn
             }
 
             monthlyTotalAmount = monthlyTotalAmount.add(weeklyData.getWeeklyTotalAmount());
+            monthlyValuationTotal = monthlyValuationTotal.add(weeklyData.getWeeklyValuationTotal());
             monthlyTotalCount += weeklyData.getWeeklyTotalCount();
             weeklyDataCount++;
         }
@@ -57,6 +59,7 @@ public class MonthlyInvestAmountProcessor implements ItemProcessor<List<WeeklyIn
         MonthlyInvestSummaryVo monthlyMemberSummary = new MonthlyInvestSummaryVo();
         monthlyMemberSummary.setMemberId(memberId);
         monthlyMemberSummary.setMonthlyTotalAmount(monthlyTotalAmount);
+        monthlyMemberSummary.setMonthlyValuationTotal(monthlyValuationTotal);
         monthlyMemberSummary.setMonthlyTotalCount(monthlyTotalCount);
 
         Timestamp currentTime = new Timestamp(System.currentTimeMillis());

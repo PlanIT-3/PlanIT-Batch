@@ -24,7 +24,8 @@ public class WeeklyInvestAmountScheduler {
     private Job weeklyInvestJob;
 
     @Scheduled(cron = "0 0 0 * * MON") // 매주 월요일 자정에 실행
-    public  void runWeeklyInvestmentJob() {
+//        @Scheduled(cron = "0 */2 * * * ?") // 테스트용, 2분마다 실행
+    public void runWeeklyInvestmentJob() {
         try {
             log.info("주간 투자금액 계산 배치 작업 시작");
             String targetDate = LocalDate.now().minusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));

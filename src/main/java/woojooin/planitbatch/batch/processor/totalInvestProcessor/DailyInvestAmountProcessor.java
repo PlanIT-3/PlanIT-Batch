@@ -23,6 +23,7 @@ public class DailyInvestAmountProcessor implements ItemProcessor<MemberVo, Daily
         }
           Map<String, BigDecimal> dailyAmountMap = new HashMap<>();
           Map<String, Long> dailyCountMap = new HashMap<>();
+          Map<String, BigDecimal> dailyValuationMap = new HashMap<>();
 
 
         for (MemberProductVo product : member.getProducts()) {
@@ -35,8 +36,9 @@ public class DailyInvestAmountProcessor implements ItemProcessor<MemberVo, Daily
                     cal.get(Calendar.DAY_OF_MONTH));
 
             BigDecimal totalAmount = product.getPurchaseAmount().multiply(product.getQuantity());
-
+            BigDecimal valuationAmount = product.getValuationAmount().multiply(product.getQuantity());
             dailyAmountMap.merge(dailyKey, totalAmount, BigDecimal::add);
+            dailyValuationMap.merge(dailyKey, valuationAmount, BigDecimal::add);
             dailyCountMap.merge(dailyKey, 1L, Long::sum);
         }
 
@@ -49,9 +51,11 @@ public class DailyInvestAmountProcessor implements ItemProcessor<MemberVo, Daily
                     .orElse("");
 
             summaryVo.setDailyTotal(dailyAmountMap.getOrDefault(latestDate, BigDecimal.ZERO));
+            summaryVo.setDailyValuationTotal(dailyValuationMap.getOrDefault(latestDate, BigDecimal.ZERO));
             summaryVo.setDailyCount(dailyCountMap.getOrDefault(latestDate, 0L).intValue());
         } else {
             summaryVo.setDailyTotal(BigDecimal.ZERO);
+            summaryVo.setDailyValuationTotal(BigDecimal.ZERO);
             summaryVo.setDailyCount(0);
         }
 
