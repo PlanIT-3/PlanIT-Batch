@@ -13,6 +13,7 @@ import java.util.Date;
 public class DailyInvestSummaryVo {
     private Long memberId;
     private BigDecimal dailyTotal;
+    private BigDecimal dailyValuationTotal;
     private int dailyCount;
     private Date updatedAt;
     private Date createdAt;

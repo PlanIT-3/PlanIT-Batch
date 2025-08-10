@@ -7,6 +7,7 @@
         <result property="memberId" column="member_id"/>
         <result property="dailyTotal" column="daily_invest_total"/>
         <result property="dailyCount" column="daily_invest_count"/>
+        <result property="dailyValuationTotal" column="daily_valuation_total"/>
         <result property="updatedAt" column="updated_at"/>
         <result property="createdAt" column="created_at"/>
         <result property="isDeleted" column="is_deleted"/>
@@ -18,6 +19,7 @@
             member_id,
             daily_invest_total,
             daily_invest_count,
+            daily_valuation_total,
             updated_at,
             created_at,
             is_deleted
@@ -47,6 +49,7 @@
             member_id,
             daily_invest_total,
             daily_invest_count,
+            daily_valuation_total,
             updated_at,
             created_at,
             is_deleted

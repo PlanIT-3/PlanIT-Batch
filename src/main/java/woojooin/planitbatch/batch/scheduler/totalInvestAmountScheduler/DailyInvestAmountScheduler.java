@@ -26,6 +26,7 @@ public class DailyInvestAmountScheduler {
 
 
     @Scheduled(cron = "0 44 15 * * ?")
+//    @Scheduled(cron = "0 */2 * * * ?") // 테스트용, 2분마다 실행
     public void runDailyInvestmentJob()
     {
         try {

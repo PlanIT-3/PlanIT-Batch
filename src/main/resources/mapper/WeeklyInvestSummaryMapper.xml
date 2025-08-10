@@ -7,6 +7,7 @@
     <resultMap id="WeeklyInvestSummaryVoResultMap" type="woojooin.planitbatch.domain.vo.totalInvestAmountVo.WeeklyInvestSummaryVo">
         <result property="memberId" column="member_id"/>
         <result property="weeklyTotalAmount" column="weekly_total_amount"/>
+        <result property="weeklyValuationTotal" column="weekly_valuation_total"/>
         <result property="weeklyTotalCount" column="weekly_total_count"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
@@ -18,6 +19,7 @@
         INSERT INTO weekly_report (
         member_id,
         weekly_total_amount,
+        weekly_valuation_total,
         weekly_total_count,
         created_at,
         updated_at,
@@ -25,6 +27,7 @@
         ) VALUES (
         #{memberId},
         #{weeklyTotalAmount},
+        #{weeklyValuationTotal},
         #{weeklyTotalCount},
         <choose>
             <when test="createdAt != null">
