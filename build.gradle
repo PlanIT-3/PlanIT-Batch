@@ -73,6 +73,10 @@ dependencies {
     //Firebase
     implementation 'com.google.firebase:firebase-admin:9.2.0'
 
+    //Message Queue dependency
+    implementation 'org.springframework.amqp:spring-rabbit:2.4.17'
+    implementation 'com.rabbitmq:amqp-client:5.20.0'
+    
     // OpenAI
     implementation("com.openai:openai-java:${openAiVersion}")
 }
