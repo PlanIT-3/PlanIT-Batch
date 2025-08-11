@@ -1,9 +1,7 @@
 package woojooin.planitbatch.global.config;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-
-import javax.annotation.PostConstruct;
+import java.io.InputStream;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -17,30 +15,28 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 @Configuration
 public class FirebaseConfig {
+
 	@Value("classpath:firebase/firebase-admin-sdk.json")
-	private Resource resource;
+	private Resource serviceAccountJson;
 
-	private FirebaseApp firebaseApp;
-
-	@PostConstruct
-	public FirebaseApp initFirebase() {
-		try {
-			FileInputStream serviceAccount =
-				new FileInputStream(resource.getFile());
-
-			FirebaseOptions options = new FirebaseOptions.Builder()
-				.setCredentials(GoogleCredentials.fromStream(serviceAccount))
+	// FirebaseApp를 '빈'으로 등록
+	@Bean
+	public FirebaseApp firebaseApp() throws IOException {
+		try (InputStream is = serviceAccountJson.getInputStream()) {
+			FirebaseOptions options = FirebaseOptions.builder()
+				.setCredentials(GoogleCredentials.fromStream(is))
 				.build();
 
-			return FirebaseApp.initializeApp(options);
-
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+			if (FirebaseApp.getApps().isEmpty()) {
+				return FirebaseApp.initializeApp(options);
+			} else {
+				return FirebaseApp.getInstance();
+			}
 		}
 	}
 
 	@Bean
-	public FirebaseMessaging initFirebaseMessaging() {
-		return FirebaseMessaging.getInstance(firebaseApp);
+	public FirebaseMessaging firebaseMessaging(FirebaseApp app) {
+		return FirebaseMessaging.getInstance(app);
 	}
 }
