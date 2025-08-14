@@ -43,6 +43,14 @@
         FROM etf_daily_history
     </select>
 
+    <!-- 특정 시점 이후의 history 불러오기 -->
+    <select id="findByProductAfterStart" resultMap="EtfDailyHistoryMap">
+        SELECT *
+        FROM etf_daily_history
+        WHERE shorten_code = #{shortenCode}
+          AND base_date > #{startDate}
+    </select>
+
     <!-- 단건 저장 -->
     <insert id="save"
             parameterType="woojooin.planitbatch.domain.product.vo.EtfDailyHistory"

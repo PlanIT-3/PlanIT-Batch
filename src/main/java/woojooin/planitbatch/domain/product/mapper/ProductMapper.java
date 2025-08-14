@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import woojooin.planitbatch.domain.product.enums.InvestType;
 import woojooin.planitbatch.domain.product.vo.Product;
 
 @Mapper
@@ -23,4 +24,11 @@ public interface ProductMapper {
 
 	@MapKey("shortenCode")
 	Map<String, Product> getProductsByShortenCodes(@Param("productIds") List<String> productIds);
+
+	Product getHighestDifferenceProductByInvestType(@Param("investType") InvestType investType);
+
+	List<Product> findPage(@Param("offset") int offset,
+		@Param("limit") int limit);
+
+	int countAll();
 }
