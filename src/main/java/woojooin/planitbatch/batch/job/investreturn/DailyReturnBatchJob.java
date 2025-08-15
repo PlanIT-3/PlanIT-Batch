@@ -40,7 +40,6 @@ public class DailyReturnBatchJob {
 
         reader.setSqlSessionFactory(sqlSessionFactory);
         reader.setQueryId("woojooin.planitbatch.domain.mapper.DailyReturnMapper.findAllForToday");
-
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("date", LocalDate.parse(dateStr));
         reader.setParameterValues(parameters);
