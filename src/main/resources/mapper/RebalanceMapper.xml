@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="woojooin.planitbatch.domain.rebalance.mapper.RebalanceMapper">
+
+    <!-- 단일 insert -->
+    <insert id="insert"
+            parameterType="woojooin.planitbatch.domain.rebalance.vo.Rebalance"
+            useGeneratedKeys="true"
+            keyProperty="rebalanceId"
+            keyColumn="rebalance_id">
+        INSERT INTO rebalancing (goal_id,
+                                 product_code,
+                                 member_product_id,
+                                 comment,
+                                 expected_return_rate,
+                                 previous_product_name,
+                                 invest_type,
+                                 next_product_name)
+        VALUES (#{goalId},
+                #{productCode},
+                #{memberProductId},
+                #{comment},
+                #{expectedReturnRate},
+                #{previousProductName},
+                #{investType},
+                #{nextProductName})
+    </insert>
+
+    <!-- 배치 insert -->
+    <insert id="insertAll" parameterType="java.util.List">
+        INSERT INTO rebalancing (
+        goal_id,
+        product_code,
+        member_product_id,
+        comment,
+        expected_return_rate,
+        previous_product_name,
+        invest_type,
+        next_product_name
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.goalId},
+            #{item.productCode},
+            #{item.memberProductId},
+            #{item.comment},
+            #{item.expectedReturnRate},
+            #{item.previousProductName},
+            #{item.investType},
+            #{item.nextProductName}
+            )
+        </foreach>
+    </insert>
+
+    <!-- goal_id 로 조회 -->
+    <select id="selectByGoalId"
+            parameterType="long"
+            resultType="woojooin.planitbatch.domain.rebalance.vo.Rebalance">
+        SELECT rebalance_id          AS rebalanceId,
+               goal_id               AS goalId,
+               product_code          AS productCode,
+               member_product_id     AS memberProductId,
+               comment,
+               expected_return_rate  AS expectedReturnRate,
+               previous_product_name AS previousProductName,
+               invest_type           AS investType,
+               next_product_name     AS nextProductName
+        FROM rebalancing
+        WHERE goal_id = #{goalId}
+    </select>
+
+</mapper>

@@ -93,8 +93,8 @@
     </insert>
 
     <select id="getProductById" parameterType="long" resultType="woojooin.planitbatch.domain.product.vo.Product">
-        SELECT shorten_code  as productId,
-               invest_type as investType
+        SELECT shorten_code as productId,
+               invest_type  as investType
         FROM product
         WHERE shorten_code = #{productId}
     </select>
@@ -113,6 +113,20 @@
         select *
         from product
     </select>
+
+    <select id="findPage" resultType="woojooin.planitbatch.domain.product.vo.Product">
+        SELECT *
+        FROM product
+        ORDER BY shorten_code
+            LIMIT #{limit}
+        OFFSET #{offset}
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*)
+        FROM product
+    </select>
+
 
     <update id="update"
             parameterType="woojooin.planitbatch.domain.product.vo.Product">
@@ -134,7 +148,8 @@
             invest_type              = #{investType},
             base_index_name          = #{baseIndexName},
             base_index_closing_price = #{baseIndexClosingPrice},
-            net_asset_total_amount   = #{netAssetTotalAmount}
+            net_asset_total_amount   = #{netAssetTotalAmount},
+            expected_return_rate     = ${expectedReturnRate}
         WHERE shorten_code = #{shortenCode}
     </update>
 
@@ -143,4 +158,15 @@
         SELECT *
         FROM product
     </select>
+
+    <!-- 투자 성향별 가장 높은 difference를 가진 단일 Product 조회 -->
+    <select id="getHighestDifferenceProductByInvestType"
+            parameterType="woojooin.planitbatch.domain.product.enums.InvestType"
+            resultType="woojooin.planitbatch.domain.product.vo.Product">
+        SELECT *
+        FROM product
+        WHERE invest_type = #{investType}
+        ORDER BY `difference` DESC LIMIT 1
+    </select>
+
 </mapper>
