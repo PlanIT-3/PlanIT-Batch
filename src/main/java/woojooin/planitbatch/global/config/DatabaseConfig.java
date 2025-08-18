@@ -8,6 +8,8 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.batch.core.configuration.annotation.BatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -28,7 +30,6 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
-@EnableBatchProcessing
 @PropertySource("classpath:application.properties")
 @MapperScan(basePackages = {"woojooin.planitbatch.domain.mapper", "woojooin.planitbatch.domain.product.mapper",
 	"woojooin.planitbatch.domain.rebalance.mapper"})
@@ -58,6 +59,7 @@ public class DatabaseConfig implements BatchConfigurer {
 	@Value("${batch.jdbc.password}")
 	private String batchPassword;
 
+
 	@Bean
 	@Primary
 	public DataSource dataSource() {
@@ -75,6 +77,7 @@ public class DatabaseConfig implements BatchConfigurer {
 
 		return new HikariDataSource(config);
 	}
+
 
 	@Bean("batchDataSource")
 	public DataSource batchDataSource() {
