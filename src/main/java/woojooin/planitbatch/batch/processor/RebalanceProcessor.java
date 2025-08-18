@@ -66,11 +66,8 @@ public class RebalanceProcessor implements ItemProcessor<Balance, Rebalance> {
 			.investType(target.getInvestType() != null ? target.getInvestType() : baseType)
 			.expectedReturnRate(tgtExp)
 
-			//Todo: comment는 openai 연동 예정
 			.comment(String.format(
-				"Rotate %s → %s | ΔExp=%s%%, ΔDiff=%+d",
-				safe(current.getItemName()),
-				safe(target.getItemName()),
+				"만약 이 상품으로 교체했다면,\n수익이 %s%%p 높아지고\n구조 지표는 %+d만큼 개선됐을 거예요.",
 				expGap.toPlainString(),
 				diffGap))
 			.build();

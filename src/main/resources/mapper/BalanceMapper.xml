@@ -58,7 +58,7 @@
     <resultMap id="BalanceMap" type="woojooin.planitbatch.domain.rebalance.vo.Balance">
         <!-- Balance 필드 -->
         <id column="goal_id" property="goalId"/>
-        <result column="action_id" property="goalId"/>
+        <result column="action_id" property="actionId"/>
 
         <!-- MemberProduct association -->
         <association property="member_product" resultMap="MemberProductMap"/>

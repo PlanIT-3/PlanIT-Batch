@@ -17,7 +17,8 @@
                                  expected_return_rate,
                                  previous_product_name,
                                  invest_type,
-                                 next_product_name)
+                                 next_product_name,
+                                 created_at)
         VALUES (#{goalId},
                 #{productCode},
                 #{memberProductId},
@@ -25,7 +26,8 @@
                 #{expectedReturnRate},
                 #{previousProductName},
                 #{investType},
-                #{nextProductName})
+                #{nextProductName},
+                CURRENT_TIMESTAMP)
     </insert>
 
     <!-- 배치 insert -->
@@ -38,7 +40,8 @@
         expected_return_rate,
         previous_product_name,
         invest_type,
-        next_product_name
+        next_product_name,
+        created_at
         )
         VALUES
         <foreach collection="list" item="item" separator=",">
@@ -50,7 +53,8 @@
             #{item.expectedReturnRate},
             #{item.previousProductName},
             #{item.investType},
-            #{item.nextProductName}
+            #{item.nextProductName},
+            CURRENT_TIMESTAMP
             )
         </foreach>
     </insert>
@@ -67,7 +71,8 @@
                expected_return_rate  AS expectedReturnRate,
                previous_product_name AS previousProductName,
                invest_type           AS investType,
-               next_product_name     AS nextProductName
+               next_product_name     AS nextProductName,
+               created_at            AS createdAt
         FROM rebalancing
         WHERE goal_id = #{goalId}
     </select>
