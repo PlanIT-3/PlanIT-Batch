@@ -8,10 +8,12 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
+import woojooin.planitbatch.domain.product.enums.InvestType;
 import woojooin.planitbatch.domain.product.repository.EtfDailyHistoryRepository;
 import woojooin.planitbatch.domain.product.repository.ProductRepository;
 import woojooin.planitbatch.domain.product.vo.EtfDailyHistory;
 import woojooin.planitbatch.domain.product.vo.Product;
+import woojooin.planitbatch.global.util.calculate.ProductCal;
 import woojooin.planitbatch.global.util.calculate.RebalanceCalc;
 
 @Component
@@ -35,8 +37,12 @@ public class ProductProcessor implements ItemProcessor<Product, Product> {
 		LocalDate start = LocalDate.now().minusMonths(PREDICT_MONTH);
 		List<EtfDailyHistory> histories = etfDailyHistoryRepository.findByProductAfterStart(product.getShortenCode(),
 			start);
+
+		String etfType = ProductCal.inferEtfType(product.getItemName(), product.getBaseIndexName());
+		InvestType investType = ProductCal.classify(histories, etfType, product.getShortenCode());
 		BigDecimal expectedReturnRate = RebalanceCalc.predictReturnPercentageMonths(histories, PREDICT_MONTH);
 
+		product.setInvestType(investType);
 		product.setExpectedReturnRate(expectedReturnRate);
 
 		return product;
