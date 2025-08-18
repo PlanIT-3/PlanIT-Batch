@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class BatchScheduler {
+public class IsaTaxSavingJobBatchScheduler {
 
 	private final JobLauncher jobLauncher;
 	private final JobExplorer jobExplorer;
