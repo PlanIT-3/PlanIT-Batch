@@ -6,11 +6,10 @@
     <!-- 투자성향 비율 업데이트 -->
     <update id="updateInvestmentRatios" parameterType="woojooin.planitbatch.domain.vo.InvestmentRatio">
         UPDATE member
-        SET
-            stable = #{stable},
-            income = #{income},
-            liquid = #{liquid},
-            growth = #{growth},
+        SET stable      = #{stable},
+            income      = #{income},
+            liquid      = #{liquid},
+            growth      = #{growth},
             diversified = #{diversified}
         WHERE member_id = #{memberId}
     </update>
@@ -19,35 +18,35 @@
     <update id="updateInvestmentRatiosBulk" parameterType="java.util.List">
         UPDATE member
         SET
-            stable = CASE member_id
-                <foreach collection="list" item="ratio">
-                    WHEN #{ratio.memberId} THEN #{ratio.stable}
-                </foreach>
-            END,
-            income = CASE member_id
-                <foreach collection="list" item="ratio">
-                    WHEN #{ratio.memberId} THEN #{ratio.income}
-                </foreach>
-            END,
-            liquid = CASE member_id
-                <foreach collection="list" item="ratio">
-                    WHEN #{ratio.memberId} THEN #{ratio.liquid}
-                </foreach>
-            END,
-            growth = CASE member_id
-                <foreach collection="list" item="ratio">
-                    WHEN #{ratio.memberId} THEN #{ratio.growth}
-                </foreach>
-            END,
-            diversified = CASE member_id
-                <foreach collection="list" item="ratio">
-                    WHEN #{ratio.memberId} THEN #{ratio.diversified}
-                </foreach>
-            END
+        stable = CASE member_id
+        <foreach collection="list" item="ratio">
+            WHEN #{ratio.memberId} THEN #{ratio.stable}
+        </foreach>
+        END,
+        income = CASE member_id
+        <foreach collection="list" item="ratio">
+            WHEN #{ratio.memberId} THEN #{ratio.income}
+        </foreach>
+        END,
+        liquid = CASE member_id
+        <foreach collection="list" item="ratio">
+            WHEN #{ratio.memberId} THEN #{ratio.liquid}
+        </foreach>
+        END,
+        growth = CASE member_id
+        <foreach collection="list" item="ratio">
+            WHEN #{ratio.memberId} THEN #{ratio.growth}
+        </foreach>
+        END,
+        diversified = CASE member_id
+        <foreach collection="list" item="ratio">
+            WHEN #{ratio.memberId} THEN #{ratio.diversified}
+        </foreach>
+        END
         WHERE member_id IN (
-            <foreach collection="list" item="ratio" separator=",">
-                #{ratio.memberId}
-            </foreach>
+        <foreach collection="list" item="ratio" separator=",">
+            #{ratio.memberId}
+        </foreach>
         )
     </update>
 

@@ -10,6 +10,8 @@ src/main/resources/application.properties
 .env
 deploy-*
 *TestController*
+*TestService*
+firebase-admin-sdk.json
 
 ### IntelliJ IDEA ###
 .idea/**

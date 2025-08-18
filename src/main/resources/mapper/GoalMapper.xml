@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="woojooin.planitbatch.domain.mapper.GoalMapper">
+    <select id="getGoalsPaginated" parameterType="java.util.Map" resultType="woojooin.planitbatch.domain.vo.Goal">
+        SELECT 
+            goal_id as goalId,
+            member_id as memberId,
+            target_amount as targetAmount,
+            deposit_rate as depositRate,
+            isa_rate as isaRate,
+            goal_rate as goalRate
+        FROM goal
+        WHERE end_date >= CURDATE()
+        <if test="lastGoalId != null">
+            AND goal_id > #{lastGoalId}
+        </if>
+        ORDER BY goal_id ASC
+        LIMIT #{limit}
+    </select>
+</mapper>

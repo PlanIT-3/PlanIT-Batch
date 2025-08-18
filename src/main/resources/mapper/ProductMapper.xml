@@ -1,28 +1,172 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="woojooin.planitbatch.domain.mapper.ProductMapper">
+<mapper namespace="woojooin.planitbatch.domain.product.mapper.ProductMapper">
+    <insert id="save"
+            parameterType="woojooin.planitbatch.domain.product.vo.Product">
+        INSERT INTO product (shorten_code,
+                             isin_code,
+                             item_name,
+                             base_date,
+                             closing_price,
+                             `difference`,
+                             fluctuation_rate,
+                             net_asset_value,
+                             market_open_price,
+                             high_price,
+                             low_price,
+                             trade_quantity,
+                             trade_price,
+                             market_total_amount,
+                             stock_listing_count,
+                             invest_type,
+                             base_index_name,
+                             base_index_closing_price,
+                             net_asset_total_amount)
+        VALUES (#{shortenCode},
+                #{isinCode},
+                #{itemName},
+                #{baseDate},
+                #{closingPrice},
+                #{difference},
+                #{fluctuationRate},
+                #{netAssetValue},
+                #{marketOpenPrice},
+                #{highPrice},
+                #{lowPrice},
+                #{tradeQuantity},
+                #{tradePrice},
+                #{marketTotalAmount},
+                #{stockListingCount},
+                #{investType},
+                #{baseIndexName},
+                #{baseIndexClosingPrice},
+                #{netAssetTotalAmount})
+    </insert>
 
-    <select id="getProductById" parameterType="long" resultType="woojooin.planitbatch.domain.vo.Product">
-        SELECT 
-            product_id as productId,
-            invest_type as investmentType
-        FROM product 
-        WHERE product_id = #{productId}
+    <insert id="saveAll" parameterType="java.util.List">
+        INSERT INTO product (
+        shorten_code,
+        isin_code,
+        item_name,
+        base_date,
+        closing_price,
+        `difference`,
+        fluctuation_rate,
+        market_open_price,
+        high_price,
+        low_price,
+        trade_quantity,
+        trade_price,
+        market_total_amount,
+        stock_listing_count,
+        invest_type,
+        net_asset_value,
+        base_index_name,
+        base_index_closing_price,
+        net_asset_total_amount
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.shortenCode},
+            #{item.isinCode},
+            #{item.itemName},
+            #{item.baseDate},
+            #{item.closingPrice},
+            #{item.difference},
+            #{item.fluctuationRate},
+            #{item.marketOpenPrice},
+            #{item.highPrice},
+            #{item.lowPrice},
+            #{item.tradeQuantity},
+            #{item.tradePrice},
+            #{item.marketTotalAmount},
+            #{item.stockListingCount},
+            #{item.investType},
+            #{item.netAssetValue},
+            #{item.baseIndexName},
+            #{item.baseIndexClosingPrice},
+            #{item.netAssetTotalAmount}
+            )
+        </foreach>
+    </insert>
+
+    <select id="getProductById" parameterType="long" resultType="woojooin.planitbatch.domain.product.vo.Product">
+        SELECT shorten_code as productId,
+               invest_type  as investType
+        FROM product
+        WHERE shorten_code = #{productId}
     </select>
 
-    <select id="getProductsByIds" resultType="woojooin.planitbatch.domain.vo.Product">
-        SELECT 
-            product_id as productId,
-            invest_type as investmentType
-        FROM product 
-        WHERE product_id IN
+    <select id="getProductsByShortenCodes" resultType="woojooin.planitbatch.domain.product.vo.Product">
+        SELECT
+        shorten_code as shortenCode,
+        invest_type as investType
+        FROM product
+        WHERE shorten_code IN
         <foreach collection="productIds" item="productId" open="(" separator="," close=")">
             #{productId}
         </foreach>
     </select>
-    <select id="findById" resultType="woojooin.planitbatch.domain.vo.Product">
-        select * from product
+    <select id="findById" resultType="woojooin.planitbatch.domain.product.vo.Product">
+        select *
+        from product
+    </select>
+
+    <select id="findPage" resultType="woojooin.planitbatch.domain.product.vo.Product">
+        SELECT *
+        FROM product
+        ORDER BY shorten_code
+            LIMIT #{limit}
+        OFFSET #{offset}
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*)
+        FROM product
+    </select>
+
+
+    <update id="update"
+            parameterType="woojooin.planitbatch.domain.product.vo.Product">
+        UPDATE product
+        SET isin_code                = #{isinCode},
+            item_name                = #{itemName},
+            base_date                = #{baseDate},
+            closing_price            = #{closingPrice},
+            `difference`             = #{difference},
+            fluctuation_rate         = #{fluctuationRate},
+            net_asset_value          = #{netAssetValue},
+            market_open_price        = #{marketOpenPrice},
+            high_price               = #{highPrice},
+            low_price                = #{lowPrice},
+            trade_quantity           = #{tradeQuantity},
+            trade_price              = #{tradePrice},
+            market_total_amount      = #{marketTotalAmount},
+            stock_listing_count      = #{stockListingCount},
+            invest_type              = #{investType},
+            base_index_name          = #{baseIndexName},
+            base_index_closing_price = #{baseIndexClosingPrice},
+            net_asset_total_amount   = #{netAssetTotalAmount},
+            expected_return_rate     = ${expectedReturnRate}
+        WHERE shorten_code = #{shortenCode}
+    </update>
+
+    <select id="findAll"
+            resultType="woojooin.planitbatch.domain.product.vo.Product">
+        SELECT *
+        FROM product
+    </select>
+
+    <!-- 투자 성향별 가장 높은 difference를 가진 단일 Product 조회 -->
+    <select id="getHighestDifferenceProductByInvestType"
+            parameterType="woojooin.planitbatch.domain.product.enums.InvestType"
+            resultType="woojooin.planitbatch.domain.product.vo.Product">
+        SELECT *
+        FROM product
+        WHERE invest_type = #{investType}
+        ORDER BY `difference` DESC LIMIT 1
     </select>
 
 </mapper>

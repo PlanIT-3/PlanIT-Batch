@@ -21,10 +21,10 @@ public class CalculateInvestmentRatioScheduler {
     private JobLauncher jobLauncher;
 
     @Autowired
-    @Qualifier("investmentRatioJob")
+    @Qualifier("memberInvestmentRatioJob")
     private Job investmentRatioJob;
 
-    @Scheduled(cron = "0 44 15 * * ?")
+    @Scheduled(cron = "0 9 16 * * ?")
     public void runInvestmentRatioJob() {
         try {
             log.info("투자성향 비율 계산 배치 작업 시작");

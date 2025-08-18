@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="woojooin.planitbatch.domain.product.mapper.EtfDailyHistoryMapper">
+
+    <!-- ResultMap 정의 -->
+    <resultMap id="EtfDailyHistoryMap" type="woojooin.planitbatch.domain.product.vo.EtfDailyHistory">
+        <id property="etfDailyHistoryId" column="etf_daily_history_id"/>
+        <result property="shortenCode" column="shorten_code"/>
+        <result property="investType" column="invest_type"
+                typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property="baseDate" column="base_date"/>
+        <result property="isinCode" column="isin_code"/>
+        <result property="itemName" column="item_name"/>
+        <result property="closingPrice" column="closing_price"/>
+        <result property="difference" column="difference"/>
+        <result property="fluctuationRate" column="fluctuation_rate"/>
+        <result property="netAssetValue" column="net_asset_value"/>
+        <result property="marketOpenPrice" column="market_open_price"/>
+        <result property="highPrice" column="high_price"/>
+        <result property="lowPrice" column="low_price"/>
+        <result property="tradeQuantity" column="trade_quantity"/>
+        <result property="tradePrice" column="trade_price"/>
+        <result property="marketTotalAmount" column="market_total_amount"/>
+        <result property="stockListingCount" column="stock_listing_count"/>
+        <result property="baseIndexName" column="base_index_name"/>
+        <result property="baseIndexClosingPrice" column="base_index_closing_price"/>
+        <result property="netAssetTotalAmount" column="net_asset_total_amount"/>
+    </resultMap>
+
+    <!-- 단건 조회 -->
+    <select id="findById" resultMap="EtfDailyHistoryMap" parameterType="long">
+        SELECT *
+        FROM etf_daily_history
+        WHERE etf_daily_history_id = #{id}
+    </select>
+
+    <!-- 전체 조회 -->
+    <select id="findAll" resultMap="EtfDailyHistoryMap">
+        SELECT *
+        FROM etf_daily_history
+    </select>
+
+    <!-- 특정 시점 이후의 history 불러오기 -->
+    <select id="findByProductAfterStart" resultMap="EtfDailyHistoryMap">
+        SELECT *
+        FROM etf_daily_history
+        WHERE shorten_code = #{shortenCode}
+          AND base_date > #{startDate}
+    </select>
+
+    <!-- 단건 저장 -->
+    <insert id="save"
+            parameterType="woojooin.planitbatch.domain.product.vo.EtfDailyHistory"
+            useGeneratedKeys="true"
+            keyProperty="etfDailyHistoryId"
+            keyColumn="etf_daily_history_id">
+        INSERT INTO etf_daily_history (shorten_code,
+                                       base_date,
+                                       isin_code,
+                                       item_name,
+                                       closing_price,
+                                       `difference`,
+                                       fluctuation_rate,
+                                       net_asset_value,
+                                       market_open_price,
+                                       high_price,
+                                       low_price,
+                                       trade_quantity,
+                                       trade_price,
+                                       market_total_amount,
+                                       stock_listing_count,
+                                       base_index_name,
+                                       base_index_closing_price,
+                                       net_asset_total_amount)
+        VALUES (#{shortenCode},
+                #{baseDate},
+                #{isinCode},
+                #{itemName},
+                #{closingPrice},
+                #{difference},
+                #{fluctuationRate},
+                #{netAssetValue},
+                #{marketOpenPrice},
+                #{highPrice},
+                #{lowPrice},
+                #{tradeQuantity},
+                #{tradePrice},
+                #{marketTotalAmount},
+                #{stockListingCount},
+                #{baseIndexName},
+                #{baseIndexClosingPrice},
+                #{netAssetTotalAmount})
+    </insert>
+
+    <!-- 배치 저장 -->
+    <insert id="saveAll" parameterType="java.util.List">
+        INSERT INTO etf_daily_history (
+        shorten_code,
+        base_date,
+        isin_code,
+        item_name,
+        closing_price,
+        `difference`,
+        fluctuation_rate,
+        net_asset_value,
+        market_open_price,
+        high_price,
+        low_price,
+        trade_quantity,
+        trade_price,
+        market_total_amount,
+        stock_listing_count,
+        base_index_name,
+        base_index_closing_price,
+        net_asset_total_amount
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.shortenCode},
+            #{item.baseDate},
+            #{item.isinCode},
+            #{item.itemName},
+            #{item.closingPrice},
+            #{item.difference},
+            #{item.fluctuationRate},
+            #{item.netAssetValue},
+            #{item.marketOpenPrice},
+            #{item.highPrice},
+            #{item.lowPrice},
+            #{item.tradeQuantity},
+            #{item.tradePrice},
+            #{item.marketTotalAmount},
+            #{item.stockListingCount},
+            #{item.baseIndexName},
+            #{item.baseIndexClosingPrice},
+            #{item.netAssetTotalAmount}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 업데이트 -->
+    <update id="update" parameterType="woojooin.planitbatch.domain.product.vo.EtfDailyHistory">
+        UPDATE etf_daily_history
+        SET shorten_code             = #{shortenCode},
+            invest_type              = #{investType},
+            base_date                = #{baseDate},
+            isin_code                = #{isinCode},
+            item_name                = #{itemName},
+            closing_price            = #{closingPrice},
+            `difference`             = #{difference},
+            fluctuation_rate         = #{fluctuationRate},
+            net_asset_value          = #{netAssetValue},
+            market_open_price        = #{marketOpenPrice},
+            high_price               = #{highPrice},
+            low_price                = #{lowPrice},
+            trade_quantity           = #{tradeQuantity},
+            trade_price              = #{tradePrice},
+            market_total_amount      = #{marketTotalAmount},
+            stock_listing_count      = #{stockListingCount},
+            base_index_name          = #{baseIndexName},
+            base_index_closing_price = #{baseIndexClosingPrice},
+            net_asset_total_amount   = #{netAssetTotalAmount}
+        WHERE etf_daily_history_id = #{etfDailyHistoryId}
+    </update>
+
+</mapper>
