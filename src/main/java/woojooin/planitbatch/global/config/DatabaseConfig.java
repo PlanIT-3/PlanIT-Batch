@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -27,9 +28,12 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
-@EnableBatchProcessing
 @PropertySource("classpath:application.properties")
-@MapperScan("woojooin.planitbatch.domain.mapper")
+@MapperScan(basePackages = {
+    "woojooin.planitbatch.domain.mapper",
+    "woojooin.planitbatch.domain.product.mapper",
+    "woojooin.planitbatch.domain.rebalance.mapper"
+})
 public class DatabaseConfig implements BatchConfigurer {
 
     @Value("${jdbc.driver}")
@@ -94,14 +98,12 @@ public class DatabaseConfig implements BatchConfigurer {
     @Bean
     public SqlSessionFactory sqlSessionFactory() throws Exception {
         SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
-
         sessionFactory.setDataSource(dataSource());
-
+        sessionFactory.setConfigLocation(new ClassPathResource("mybatis-config.xml"));
         sessionFactory.setMapperLocations(
             new PathMatchingResourcePatternResolver()
                 .getResources("classpath:mapper/*.xml")
         );
-
         return sessionFactory.getObject();
     }
 
@@ -120,6 +122,7 @@ public class DatabaseConfig implements BatchConfigurer {
         JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
         factory.setDataSource(batchDataSource());
         factory.setTransactionManager(batchTransactionManager());
+        factory.setIsolationLevelForCreate("ISOLATION_READ_COMMITTED"); // 격리 수준 설정
         factory.afterPropertiesSet();
         return factory.getObject();
     }
@@ -144,5 +147,4 @@ public class DatabaseConfig implements BatchConfigurer {
         jobExplorerFactoryBean.afterPropertiesSet();
         return jobExplorerFactoryBean.getObject();
     }
-
 }
