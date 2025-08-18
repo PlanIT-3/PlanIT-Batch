@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="woojooin.planitbatch.domain.mapper.totalInvestAmount.DailyInvestSummaryMapper">
+
+    <insert id="insert" parameterType="woojooin.planitbatch.domain.vo.DailyInvestSummaryVo">
+        INSERT INTO daily_report (
+        member_id,
+        daily_invest_total,
+        daily_valuation_total,
+        daily_invest_count,
+        updated_at,
+        is_deleted,
+        created_at
+        ) VALUES (
+        #{memberId},
+        #{dailyTotal},
+        #{dailyValuationTotal},
+        #{dailyCount},
+        <choose>
+            <when test="updatedAt != null">
+                #{updatedAt}
+            </when>
+            <otherwise>
+                CURRENT_TIMESTAMP
+            </otherwise>
+        </choose>,
+        #{isDeleted},
+        <choose>
+            <when test="createdAt != null">
+                #{createdAt}
+            </when>
+            <otherwise>
+                CURRENT_TIMESTAMP
+            </otherwise>
+        </choose>
+        )
+    </insert>
+
+    <insert id="batchInsert">
+        INSERT INTO daily_report (
+        member_id,
+        daily_invest_total,
+        daily_invest_count,
+        updated_at,
+        is_deleted,
+        created_at
+        ) VALUES
+        <foreach collection="collection" item="item" separator=",">
+            (
+            #{item.memberId},
+            #{item.dailyTotal},
+            #{item.dailyCount},
+            #{item.updatedAt},
+            #{item.isDeleted},
+            #{item.createdAt}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

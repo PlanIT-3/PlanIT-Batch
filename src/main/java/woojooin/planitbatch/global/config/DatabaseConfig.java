@@ -102,7 +102,7 @@ public class DatabaseConfig implements BatchConfigurer {
 
 		sessionFactory.setDataSource(dataSource());
 
-		sessionFactory.setConfigLocation(new ClassPathResource("mybatis-config.xml"));
+        sessionFactory.setConfigLocation(new ClassPathResource("mybatis-config.xml"));
 		sessionFactory.setMapperLocations(
 			new PathMatchingResourcePatternResolver()
 				.getResources("classpath:mapper/*.xml")

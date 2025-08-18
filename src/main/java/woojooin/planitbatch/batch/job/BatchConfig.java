@@ -31,14 +31,16 @@ public class BatchConfig {
 	private DepositProcessor depositProcessor;
 	@Autowired
 	private DepositWriter depositWriter;
-	
+
 	@Autowired
+	private StepBuilderFactory steps;
+
 	private TaxCalculationReader taxCalculationReader;
 	@Autowired
 	private TaxCalculationProcessor taxCalculationProcessor;
 	@Autowired
 	private TaxCalculationWriter taxCalculationWriter;
-	
+
 	@Autowired
 	@Qualifier("batchTransactionManager")  // 명시적 트랜잭션 매니저 지정
 	private PlatformTransactionManager transactionManager;
