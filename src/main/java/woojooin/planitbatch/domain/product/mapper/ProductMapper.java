@@ -31,4 +31,6 @@ public interface ProductMapper {
 		@Param("limit") int limit);
 
 	int countAll();
+	@MapKey("productId")
+	Map<String, Product> getProductsByIds(@Param("productIds") List<String> productIds);
 }
