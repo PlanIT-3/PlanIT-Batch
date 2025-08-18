@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="woojooin.planitbatch.domain.mapper.DailyBalanceMapper">
+
+    <insert id="insertDailyBalances" parameterType="java.util.List">
+        INSERT INTO daily_balance (member_id, amount, created_at, updated_at)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.memberId}, #{item.amount}, NOW(), NOW())
+        </foreach>
+    </insert>
+
+</mapper>
