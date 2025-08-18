@@ -8,5 +8,10 @@ import java.util.List;
 
 public interface DailyReturnMapper {
     List<DailyReturn> findAllForToday(@Param("date")LocalDate date);
+
+    List<DailyReturn> findpast(@Param("startDate") LocalDate startDate,
+                               @Param("endDate") LocalDate endDate);
+
+
     void insert(DailyReturn dailyReturn);
 }

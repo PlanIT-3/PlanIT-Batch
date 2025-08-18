@@ -1,4 +1,4 @@
-package woojooin.planitbatch.batch.job;
+package woojooin.planitbatch.batch.job.investreturn;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.SqlSessionFactory;
