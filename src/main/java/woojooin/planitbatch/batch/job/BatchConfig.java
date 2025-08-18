@@ -10,13 +10,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @EnableBatchProcessing
+@RequiredArgsConstructor
 public class BatchConfig {
-	@Autowired
-	private JobBuilderFactory jobs;
-	@Autowired
-	private StepBuilderFactory steps;
+
+	private final JobBuilderFactory jobs;
+
+	private final StepBuilderFactory steps;
 
 	@Bean
 	public Step sampleStep() {
