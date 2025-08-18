@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- src/main/resources/mapper/BalanceMapper.xml -->
+<mapper namespace="woojooin.planitbatch.domain.rebalance.mapper.BalanceMapper">
+
+    <!-- 1) MemberProduct 맵핑 -->
+    <resultMap id="MemberProductMap" type="woojooin.planitbatch.domain.memberProduct.vo.MemberProduct">
+        <id column="member_product_id" property="memberProductId"/>
+        <result column="member_id" property="memberId"/>
+        <result column="product_id" property="productId"/>
+        <result column="product_type_code" property="productTypeCode"/>
+        <result column="account_extends" property="accountExtends"/>
+        <result column="product_type" property="productType"/>
+        <result column="avg_present_amount" property="avgPresentAmount"/>
+        <result column="present_amount" property="presentAmount"/>
+        <result column="balance_type" property="balanceType"/>
+        <result column="item_name" property="itemName"/>
+        <result column="valuation_pl" property="valuationPl"/>
+        <result column="valuation_amount" property="valuationAmount"/>
+        <result column="quantity" property="quantity"/>
+        <result column="purchase_amount" property="purchaseAmount"/>
+        <result column="earnings_rate" property="earningsRate"/>
+        <result column="account_currency" property="accountCurrency"/>
+        <result column="settle_quantity" property="settleQuantity"/>
+        <result column="item_code" property="itemCode"/>
+        <result column="deposit_received" property="depositReceived"/>
+        <result column="is_integrated" property="isIntegrated"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <!-- 2) Product 맵핑 -->
+    <resultMap id="ProductMap" type="woojooin.planitbatch.domain.product.vo.Product">
+        <id column="shorten_code" property="shortenCode"/>
+        <result column="invest_type" property="investType"/>
+        <result column="base_date" property="baseDate"/>
+        <result column="isin_code" property="isinCode"/>
+        <result column="item_name" property="itemName"/>
+        <result column="closing_price" property="closingPrice"/>
+        <result column="difference" property="difference"/>
+        <result column="fluctuation_rate" property="fluctuationRate"/>
+        <result column="net_asset_value" property="netAssetValue"/>
+        <result column="market_open_price" property="marketOpenPrice"/>
+        <result column="high_price" property="highPrice"/>
+        <result column="low_price" property="lowPrice"/>
+        <result column="trade_quantity" property="tradeQuantity"/>
+        <result column="trade_price" property="tradePrice"/>
+        <result column="market_total_amount" property="marketTotalAmount"/>
+        <result column="stock_listing_count" property="stockListingCount"/>
+        <result column="base_index_name" property="baseIndexName"/>
+        <result column="base_index_closing_price" property="baseIndexClosingPrice"/>
+        <result column="net_asset_total_amount" property="netAssetTotalAmount"/>
+        <result column="expected_return_rate" property="expectedReturnRate"/>
+    </resultMap>
+
+    <!-- 3) Balance 맵핑 (중첩 association) -->
+    <resultMap id="BalanceMap" type="woojooin.planitbatch.domain.rebalance.vo.Balance">
+        <!-- Balance 필드 -->
+        <id column="goal_id" property="goalId"/>
+        <result column="action_id" property="goalId"/>
+
+        <!-- MemberProduct association -->
+        <association property="member_product" resultMap="MemberProductMap"/>
+
+        <!-- Product association -->
+        <association property="product" resultMap="ProductMap"/>
+    </resultMap>
+
+    <!-- 4) 실제 쿼리 -->
+    <select id="findAllBalances" resultMap="BalanceMap">
+        SELECT g.goal_id,
+               a.action_id,
+               mp.*,
+               p.*
+        -- (나머지 컬럼은 필요한 만큼 나열)
+        FROM goal AS g
+                 JOIN action AS a
+                      ON a.goal_id = g.goal_id
+                 JOIN member_product AS mp
+                      ON mp.member_product_id = a.member_product_id
+                 JOIN product AS p
+                      ON mp.product_id = p.shorten_code
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT count(*)
+        FROM goal AS g
+                 JOIN action AS a
+                      ON a.goal_id = g.goal_id
+                 JOIN member_product AS mp
+                      ON mp.member_product_id = a.member_product_id
+                 JOIN product AS p
+                      ON mp.product_id = p.shorten_code
+    </select>
+
+    <select id="findBalancePanging" resultMap="BalanceMap">
+        SELECT g.goal_id,
+               a.action_id,
+               mp.*,
+               p.*
+        FROM goal AS g
+                 JOIN action AS a
+                      ON a.goal_id = g.goal_id
+                 JOIN member_product AS mp
+                      ON mp.member_product_id = a.member_product_id
+                 JOIN product AS p
+                      ON mp.product_id = p.shorten_code
+        ORDER BY goal_id
+            LIMIT #{limit}
+        OFFSET #{offset}
+    </select>
+</mapper>

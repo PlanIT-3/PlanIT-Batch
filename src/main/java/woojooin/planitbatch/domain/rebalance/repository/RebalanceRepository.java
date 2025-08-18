@@ -13,20 +13,20 @@ import woojooin.planitbatch.domain.rebalance.vo.Rebalance;
 @RequiredArgsConstructor
 public class RebalanceRepository {
 
-	private RebalanceMapper rebalanceMapper;
+	private final RebalanceMapper rebalanceMapper;
 
 	/** 단일 리밸런싱 내역 저장 */
-	int insert(Rebalance rebalance) {
+	public int insert(Rebalance rebalance) {
 		return rebalanceMapper.insert(rebalance);
 	}
 
 	/** 여러 리밸런싱 내역 배치 저장 */
-	int insertAll(@Param("list") List<Rebalance> rebalances) {
+	public int insertAll(@Param("list") List<Rebalance> rebalances) {
 		return rebalanceMapper.insertAll(rebalances);
 	}
 
 	/** goal_id 로 조회 */
-	List<Rebalance> selectByGoalId(@Param("goalId") Long goalId) {
+	public List<Rebalance> selectByGoalId(@Param("goalId") Long goalId) {
 		return rebalanceMapper.selectByGoalId(goalId);
 	}
 }
