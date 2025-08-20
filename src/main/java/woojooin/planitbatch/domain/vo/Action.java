@@ -8,13 +8,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Action {
-    private Long actionId;
-    private Long goalId;
-    private Long accountId;
-    private Long memberProductId;
-    private Integer allocatedRate;
-    private Integer accountAllocatedRate;
-    private String accountType;
-    private Integer amount;
-    private Boolean isDeleted;
+	private Long actionId;
+	private Long goalId;
+	private Long accountId;
+	private Long memberProductId;
+	private Integer accountAllocatedRate;
+	private String accountType;
+	private Integer amount;
+	private Boolean isDeleted;
 }

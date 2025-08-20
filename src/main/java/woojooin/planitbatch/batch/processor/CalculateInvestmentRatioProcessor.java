@@ -67,7 +67,7 @@ public class CalculateInvestmentRatioProcessor implements ItemProcessor<List<Mem
 
 	private InvestmentRatio calculateRatio(Long memberId, List<MemberProduct> memberProducts,
 		Map<String, Product> products) {
-		log.info("=== Member {} 계산 시작 ===", memberId);
+		// log.info("=== Member {} 계산 시작 ===", memberId);
 
 		if (memberProducts == null || memberProducts.isEmpty()) {
 			log.info("Member {} - memberProducts가 비어있음", memberId);
@@ -95,7 +95,7 @@ public class CalculateInvestmentRatioProcessor implements ItemProcessor<List<Mem
 				Collectors.counting()
 			));
 
-		log.info("Member {} - 투자 타입 분포: {}", memberId, investTypeCounts);
+		// log.info("Member {} - 투자 타입 분포: {}", memberId, investTypeCounts);
 
 		if (investTypeCounts.isEmpty()) {
 			log.info("Member {} - investTypeCounts가 비어있음", memberId);
@@ -103,7 +103,7 @@ public class CalculateInvestmentRatioProcessor implements ItemProcessor<List<Mem
 		}
 
 		double totalCount = investTypeCounts.values().stream().mapToLong(Long::longValue).sum();
-		log.info("Member {} - 총 상품 수: {}", memberId, totalCount);
+		// log.info("Member {} - 총 상품 수: {}", memberId, totalCount);
 
 		InvestmentRatio result = InvestmentRatio.builder()
 			.memberId(memberId)
@@ -114,8 +114,8 @@ public class CalculateInvestmentRatioProcessor implements ItemProcessor<List<Mem
 			.diversified(calculatePercentage(investTypeCounts.getOrDefault("VERY_AGGRESSIVE", 0L), totalCount))
 			.build();
 
-		log.info("Member {} - 계산 결과: {}", memberId, result);
-		log.info("=== Member {} 계산 완료 ===", memberId);
+		// log.info("Member {} - 계산 결과: {}", memberId, result);
+		// log.info("=== Member {} 계산 완료 ===", memberId);
 
 		return result;
 	}

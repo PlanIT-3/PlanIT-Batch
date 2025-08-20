@@ -15,7 +15,7 @@ import woojooin.planitbatch.domain.rebalance.vo.Balance;
 @RequiredArgsConstructor
 public class RebalanceReader implements ItemReader<Balance> {
 
-	public static int CHUNK_SIZE = 10;
+	public static int CHUNK_SIZE = 100;
 	private final JobLauncher jobLauncher;
 
 	private int totalCount = 0;

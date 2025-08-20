@@ -2,6 +2,7 @@ package woojooin.planitbatch.batch.scheduler;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
@@ -18,28 +19,29 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class GoalProgressScheduler {
 
-    @Autowired
-    private JobLauncher jobLauncher;
+	@Autowired
+	private JobLauncher jobLauncher;
 
-    @Autowired
-    @Qualifier("dailyGoalProgressJob")
-    private Job goalProgressJob;
+	@Autowired
+	@Qualifier("dailyGoalProgressJob")
+	private Job goalProgressJob;
 
-    @Scheduled(cron = "0 37 10 * * ?")
-    public void runGoalProgressJob() {
-        try {
-            log.info("목표 진행률 계산 배치 작업 시작");
-            
-            String dateParam = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-            JobParameters jobParameters = new JobParametersBuilder()
-                .addString("date", dateParam)
-                .toJobParameters();
-            
-            jobLauncher.run(goalProgressJob, jobParameters);
-            
-            log.info("목표 진행률 계산 배치 작업 완료");
-        } catch (Exception e) {
-            log.error("목표 진행률 계산 배치 작업 실패", e);
-        }
-    }
+	@Scheduled(cron = "0 30 21 * * ?")
+	public void runGoalProgressJob() {
+		try {
+			log.info("목표 진행률 계산 배치 작업 시작");
+
+			String dateParam =
+				LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + UUID.randomUUID().toString();
+			JobParameters jobParameters = new JobParametersBuilder()
+				.addString("date", dateParam)
+				.toJobParameters();
+
+			jobLauncher.run(goalProgressJob, jobParameters);
+
+			log.info("목표 진행률 계산 배치 작업 완료");
+		} catch (Exception e) {
+			log.error("목표 진행률 계산 배치 작업 실패", e);
+		}
+	}
 }

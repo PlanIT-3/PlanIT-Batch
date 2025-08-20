@@ -1,5 +1,8 @@
 package woojooin.planitbatch.global.util.openData;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -45,17 +48,19 @@ public class OpenDataUtil {
 	/**
 	 *
 	 * @param pageNo : 페이징 순서
-	 * @param pageSize : 페이징 사이즈
 	 * @return
 	 */
-	public OpenApiResponse<ETFPriceRes> getTodayETFPriceInfo(int pageNo, int pageSize) {
+	public OpenApiResponse<ETFPriceRes> getETFPriceInfoByDateAndPagination(int pageNo, int numOfRows,
+		LocalDate date) {
 
 		StringBuilder uriBuilder = new StringBuilder();
-
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+		String formattedDate = date.format(formatter);
 		uriBuilder.append(OPEN_API_BASE_URL).append("/getETFPriceInfo")
 			.append("?").append("serviceKey=").append(OPEN_API_SERVICE_KEY)
 			.append("&").append("resultType=").append("json")
-			.append("&").append("pageSize=").append(pageSize)
+			.append("&").append("beginBasDt=").append(formattedDate)
+			.append("&").append("numOfRows=").append(numOfRows)
 			.append("&").append("pageNo=").append(pageNo);
 
 		String response = ConnectionUtil.sendRequest(uriBuilder.toString());

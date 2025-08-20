@@ -27,8 +27,6 @@ public class RebalanceWriter implements ItemWriter<Rebalance> {
 			rebalances.add(rebalance);
 		}
 
-		log.info("[writer] - {}", rebalances);
-
 		rebalanceRepository.insertAll(rebalances);
 	}
 }
