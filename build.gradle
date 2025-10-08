@@ -17,6 +17,8 @@ ext {
     springVersion = '5.3.37'
     springBatchVersion = '4.3.10'
     openAiVersion = '2.19.2'
+    redisVersion = '2.7.18'
+    lettuceVersion = '6.1.10.RELEASE'
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -76,9 +78,17 @@ dependencies {
     //Message Queue dependency
     implementation 'org.springframework.amqp:spring-rabbit:2.4.17'
     implementation 'com.rabbitmq:amqp-client:5.20.0'
-    
+
     // OpenAI
     implementation("com.openai:openai-java:${openAiVersion}")
+
+
+    implementation "org.springframework.data:spring-data-redis:${redisVersion}"
+    implementation "io.lettuce:lettuce-core:${lettuceVersion}"
+
+    implementation "io.micrometer:micrometer-core:1.13.1"
+    implementation "io.micrometer:micrometer-registry-prometheus:1.13.1"
+    implementation "io.micrometer:micrometer-jakarta9:1.13.1"
 }
 
 test {
