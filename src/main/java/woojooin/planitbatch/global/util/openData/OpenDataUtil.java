@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import woojooin.planitbatch.global.util.ConnectionUtil;
 import woojooin.planitbatch.global.util.openData.dto.OpenApiResponse;
 import woojooin.planitbatch.global.util.openData.dto.price.etf.ETFPriceRes;
+import woojooin.planitbatch.global.util.openData.dto.price.etf.KRXETFRes;
 
 @Slf4j
 @Component
@@ -22,6 +23,12 @@ public class OpenDataUtil {
 
 	@Value("${open.api.service-key}")
 	private String OPEN_API_SERVICE_KEY;
+
+	@Value("${krx.api.base-url}")
+	private String KRX_API_BASE_URL;
+
+	@Value("${krx.api.service-key}")
+	private String KRX_API_SERVICE_KEY;
 
 	/**
 	 * 공공데이터 open-api 금융위원회_증권상품시세정보 - ETF 시세
@@ -97,5 +104,26 @@ public class OpenDataUtil {
 		return ETFResponse;
 	}
 
+	/**
+	 * 공공데이터 open-api 금융위원회_증권상품시세정보 - ETF 시세
+	 * @return 응답 문자열
+	 */
+	public KRXETFRes getETFPriceInfoKRX(String baseDate) {
+
+		StringBuilder uriBuilder = new StringBuilder();
+
+		uriBuilder.append(KRX_API_BASE_URL).append("/svc/apis/etp/etf_bydd_trd")
+			.append("?").append("AUTH_KEY=").append(KRX_API_SERVICE_KEY)
+			.append("&").append("basDd=").append(baseDate);
+
+		String response = ConnectionUtil.sendRequest(uriBuilder.toString());
+
+		TypeReference<KRXETFRes> type = new TypeReference<>() {
+		};
+		KRXETFRes krxEtfRes = ConnectionUtil.decodeJsonStringToDto(response, type,
+			ConnectionUtil.SNAKE);
+
+		return krxEtfRes;
+	}
 }
 
