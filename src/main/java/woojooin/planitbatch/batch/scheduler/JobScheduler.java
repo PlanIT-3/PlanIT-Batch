@@ -9,22 +9,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class JobScheduler {
 
-    @Autowired
-    private JobLauncher jobLauncher;
+	@Autowired
+	private JobLauncher jobLauncher;
 
-    @Autowired
-    private Job testJob; // 실행 Job
+	@Autowired
+	private Job testJob; // 실행 Job
 
-    @Scheduled(cron = "0 46 13 * * ?") // 트리거 타임
-    public void runTestJob() {
-        try {
-            // JobParameters jobParameters = new JobParametersBuilder()
-            //     .addLong("timestamp", System.currentTimeMillis())
-            //     .toJobParameters();
-            //
-            // jobLauncher.run(testJob, jobParameters);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+	@Scheduled(cron = "0 0 0 * * ?") // 트리거 타임
+	public void runTestJob() {
+		try {
+			// JobParameters jobParameters = new JobParametersBuilder()
+			//     .addLong("timestamp", System.currentTimeMillis())
+			//     .toJobParameters();
+			//
+			// jobLauncher.run(testJob, jobParameters);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }
