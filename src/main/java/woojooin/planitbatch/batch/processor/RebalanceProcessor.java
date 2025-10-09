@@ -2,6 +2,8 @@ package woojooin.planitbatch.batch.processor;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.batch.item.ItemProcessor;
@@ -20,6 +22,10 @@ public class RebalanceProcessor implements ItemProcessor<Balance, Rebalance> {
 
 	private final ProductRepository productRepository;
 
+	private static long totalElapsed = 0;
+	private static long count = 0;
+	private Map<InvestType, Product> products = new HashMap<>();
+
 	@Override
 	public Rebalance process(Balance balance) {
 		if (balance == null || balance.getProduct() == null)
@@ -28,11 +34,28 @@ public class RebalanceProcessor implements ItemProcessor<Balance, Rebalance> {
 		Product current = balance.getProduct();
 		InvestType baseType = current.getInvestType() != null ? current.getInvestType() : InvestType.AGGRESSIVE;
 
-		// 1) 타깃 상품 선정: 같은 성향에서 difference 최상위, 없으면 AGGRESSIVE
-		Product target = productRepository
-			.getHighestDifferenceProductByInvestType(baseType)
-			.orElseGet(() -> productRepository.getHighestDifferenceProductByInvestType(InvestType.AGGRESSIVE)
-				.orElse(null));
+		long start = System.nanoTime();
+
+		Product target;
+
+		if (products.containsKey(baseType)) {
+			target = products.get(baseType);
+		} else {
+			// 1) 타깃 상품 선정: 같은 성향에서 difference 최상위, 없으면 AGGRESSIVE
+			target = productRepository
+				.getHighestDifferenceProductByInvestType(baseType)
+				.orElseGet(() -> productRepository.getHighestDifferenceProductByInvestType(InvestType.AGGRESSIVE)
+					.orElse(null));
+		}
+
+		long end = System.nanoTime();
+		long elapsedTime = end - start;
+		System.out.println("Elapsed time: " + elapsedTime + " ns");
+
+		synchronized (RebalanceProcessor.class) {
+			totalElapsed += elapsedTime;
+			count++;
+		}
 
 		if (target == null)
 			return null;
@@ -58,7 +81,7 @@ public class RebalanceProcessor implements ItemProcessor<Balance, Rebalance> {
 
 		// 5) Rebalance 빌드
 		return Rebalance.builder()
-			.productCode(target.getShortenCode())                 // 다음에 갈 종목 코드
+			.productCode(target.getShortenCode())
 			.memberProductId(memberProductId)
 			.goalId(goalId)
 			.previousProductName(safe(current.getItemName()))
@@ -66,11 +89,8 @@ public class RebalanceProcessor implements ItemProcessor<Balance, Rebalance> {
 			.investType(target.getInvestType() != null ? target.getInvestType() : baseType)
 			.expectedReturnRate(tgtExp)
 
-			//Todo: comment는 openai 연동 예정
 			.comment(String.format(
-				"Rotate %s → %s | ΔExp=%s%%, ΔDiff=%+d",
-				safe(current.getItemName()),
-				safe(target.getItemName()),
+				"만약 이 상품으로 교체했다면,\n수익이 %s%%p 높아지고\n구조 지표는 %+d만큼 개선됐을 거예요.",
 				expGap.toPlainString(),
 				diffGap))
 			.build();

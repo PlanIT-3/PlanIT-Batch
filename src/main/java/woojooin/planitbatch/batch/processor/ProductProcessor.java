@@ -2,18 +2,23 @@ package woojooin.planitbatch.batch.processor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import woojooin.planitbatch.domain.product.enums.InvestType;
 import woojooin.planitbatch.domain.product.repository.EtfDailyHistoryRepository;
 import woojooin.planitbatch.domain.product.repository.ProductRepository;
 import woojooin.planitbatch.domain.product.vo.EtfDailyHistory;
 import woojooin.planitbatch.domain.product.vo.Product;
+import woojooin.planitbatch.global.util.calculate.ProductCal;
 import woojooin.planitbatch.global.util.calculate.RebalanceCalc;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ProductProcessor implements ItemProcessor<Product, Product> {
@@ -35,8 +40,20 @@ public class ProductProcessor implements ItemProcessor<Product, Product> {
 		LocalDate start = LocalDate.now().minusMonths(PREDICT_MONTH);
 		List<EtfDailyHistory> histories = etfDailyHistoryRepository.findByProductAfterStart(product.getShortenCode(),
 			start);
+
+		Iterator<EtfDailyHistory> iterator = histories.iterator();
+		while (iterator.hasNext()) {
+			EtfDailyHistory history = iterator.next();
+			if (history.getClosingPrice() == null) {
+				iterator.remove();
+			}
+		}
+
+		String etfType = ProductCal.inferEtfType(product.getItemName(), product.getBaseIndexName());
+		InvestType investType = ProductCal.classify(histories, etfType, product.getShortenCode());
 		BigDecimal expectedReturnRate = RebalanceCalc.predictReturnPercentageMonths(histories, PREDICT_MONTH);
 
+		product.setInvestType(investType);
 		product.setExpectedReturnRate(expectedReturnRate);
 
 		return product;

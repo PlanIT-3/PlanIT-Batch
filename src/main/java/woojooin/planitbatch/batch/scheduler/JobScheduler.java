@@ -23,7 +23,7 @@ public class JobScheduler {
     private volatile boolean isTaxJobRunning = false;
     private final Object jobLock = new Object();
 
-    @Scheduled(cron = "0 51 14 * * ?") // 테스트용: 14시 51분 실행
+    @Scheduled(cron = "0 0 0 * * ?")
     public void runDepositCollectionJob() {
         synchronized (jobLock) {  // 동시 실행 방지
             if (isDepositJobRunning) {

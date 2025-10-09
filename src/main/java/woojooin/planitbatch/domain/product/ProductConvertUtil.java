@@ -1,5 +1,6 @@
 package woojooin.planitbatch.domain.product;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.List;
 import woojooin.planitbatch.domain.product.vo.EtfDailyHistory;
 import woojooin.planitbatch.domain.product.vo.Product;
 import woojooin.planitbatch.global.util.openData.dto.price.etf.ETFPriceRes;
+import woojooin.planitbatch.global.util.openData.dto.price.etf.KRXETFRes;
 
 public class ProductConvertUtil {
 	public static List<Product> openDataResToProductVoList(ETFPriceRes res) {
@@ -65,4 +67,66 @@ public class ProductConvertUtil {
 			.netAssetTotalAmount(item.getNPptTotAmt())
 			.build();
 	}
+
+	public static List<Product> krxResToProductVoList(KRXETFRes res) {
+		List<Product> productList = new ArrayList<>();
+
+		for (KRXETFRes.KRXEtfPriceInfo info : res.getOutBlock1()) {
+			productList.add(krxToProductVO(info));
+		}
+
+		return productList;
+	}
+
+	public static Product krxToProductVO(KRXETFRes.KRXEtfPriceInfo info) {
+		return Product.builder()
+			.shortenCode(info.getIsuCd()) // 종목코드 (단축코드)
+			.baseDate(LocalDate.parse(info.getBasDd(), DateTimeFormatter.BASIC_ISO_DATE))
+			.isinCode(info.getIsuCd()) // 동일 설정
+			.itemName(info.getIsuNm())
+
+			.closingPrice(parseIntSafe(info.getTddClsprc()))
+			.difference(parseIntSafe(info.getCmpprevddPrc()))
+			.fluctuationRate(parseBigDecimalSafe(info.getFlucRt()))
+			.netAssetValue(parseBigDecimalSafe(info.getNav()))
+			.marketOpenPrice(parseIntSafe(info.getTddOpnprc()))
+			.highPrice(parseIntSafe(info.getTddHgprc()))
+			.lowPrice(parseIntSafe(info.getTddLwprc()))
+			.tradeQuantity(parseLongSafe(info.getAccTrdvol()))
+			.tradePrice(parseLongSafe(info.getAccTrdval()))
+			.marketTotalAmount(parseLongSafe(info.getMktcap()))
+			.stockListingCount(parseLongSafe(info.getListShrs()))
+			.baseIndexName(info.getIdxIndNm())
+			.baseIndexClosingPrice(parseBigDecimalSafe(info.getObjStkprcIdx()))
+			.netAssetTotalAmount(parseLongSafe(info.getInvstasstNetasstTotamt()))
+
+			// 계산필드 (KRX 응답에 없음)
+			.expectedReturnRate(null)
+			.build();
+	}
+
+	private static Integer parseIntSafe(String value) {
+		try {
+			return (value == null || value.isEmpty()) ? null : Integer.parseInt(value.replaceAll(",", ""));
+		} catch (NumberFormatException e) {
+			return null;
+		}
+	}
+
+	private static Long parseLongSafe(String value) {
+		try {
+			return (value == null || value.isEmpty()) ? null : Long.parseLong(value.replaceAll(",", ""));
+		} catch (NumberFormatException e) {
+			return null;
+		}
+	}
+
+	private static BigDecimal parseBigDecimalSafe(String value) {
+		try {
+			return (value == null || value.isEmpty()) ? null : new BigDecimal(value.replaceAll(",", ""));
+		} catch (NumberFormatException e) {
+			return null;
+		}
+	}
+
 }

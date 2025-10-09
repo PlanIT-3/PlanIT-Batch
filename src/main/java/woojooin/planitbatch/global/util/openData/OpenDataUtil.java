@@ -1,5 +1,8 @@
 package woojooin.planitbatch.global.util.openData;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -9,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import woojooin.planitbatch.global.util.ConnectionUtil;
 import woojooin.planitbatch.global.util.openData.dto.OpenApiResponse;
 import woojooin.planitbatch.global.util.openData.dto.price.etf.ETFPriceRes;
+import woojooin.planitbatch.global.util.openData.dto.price.etf.KRXETFRes;
 
 @Slf4j
 @Component
@@ -19,6 +23,12 @@ public class OpenDataUtil {
 
 	@Value("${open.api.service-key}")
 	private String OPEN_API_SERVICE_KEY;
+
+	@Value("${krx.api.base-url}")
+	private String KRX_API_BASE_URL;
+
+	@Value("${krx.api.service-key}")
+	private String KRX_API_SERVICE_KEY;
 
 	/**
 	 * 공공데이터 open-api 금융위원회_증권상품시세정보 - ETF 시세
@@ -45,17 +55,19 @@ public class OpenDataUtil {
 	/**
 	 *
 	 * @param pageNo : 페이징 순서
-	 * @param pageSize : 페이징 사이즈
 	 * @return
 	 */
-	public OpenApiResponse<ETFPriceRes> getTodayETFPriceInfo(int pageNo, int pageSize) {
+	public OpenApiResponse<ETFPriceRes> getETFPriceInfoByDateAndPagination(int pageNo, int numOfRows,
+		LocalDate date) {
 
 		StringBuilder uriBuilder = new StringBuilder();
-
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+		String formattedDate = date.format(formatter);
 		uriBuilder.append(OPEN_API_BASE_URL).append("/getETFPriceInfo")
 			.append("?").append("serviceKey=").append(OPEN_API_SERVICE_KEY)
 			.append("&").append("resultType=").append("json")
-			.append("&").append("pageSize=").append(pageSize)
+			.append("&").append("beginBasDt=").append(formattedDate)
+			.append("&").append("numOfRows=").append(numOfRows)
 			.append("&").append("pageNo=").append(pageNo);
 
 		String response = ConnectionUtil.sendRequest(uriBuilder.toString());
@@ -92,5 +104,26 @@ public class OpenDataUtil {
 		return ETFResponse;
 	}
 
+	/**
+	 * 공공데이터 open-api 금융위원회_증권상품시세정보 - ETF 시세
+	 * @return 응답 문자열
+	 */
+	public KRXETFRes getETFPriceInfoKRX(String baseDate) {
+
+		StringBuilder uriBuilder = new StringBuilder();
+
+		uriBuilder.append(KRX_API_BASE_URL).append("/svc/apis/etp/etf_bydd_trd")
+			.append("?").append("AUTH_KEY=").append(KRX_API_SERVICE_KEY)
+			.append("&").append("basDd=").append(baseDate);
+
+		String response = ConnectionUtil.sendRequest(uriBuilder.toString());
+
+		TypeReference<KRXETFRes> type = new TypeReference<>() {
+		};
+		KRXETFRes krxEtfRes = ConnectionUtil.decodeJsonStringToDto(response, type,
+			ConnectionUtil.SNAKE);
+
+		return krxEtfRes;
+	}
 }
 

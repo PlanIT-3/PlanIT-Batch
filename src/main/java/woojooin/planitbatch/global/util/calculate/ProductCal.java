@@ -1,15 +1,38 @@
 package woojooin.planitbatch.global.util.calculate;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import woojooin.planitbatch.domain.product.enums.InvestType;
-import woojooin.planitbatch.global.util.openData.dto.price.etf.ETFPriceRes;
+import woojooin.planitbatch.domain.product.vo.EtfDailyHistory;
 
+@Slf4j
 public class ProductCal {
+
+	private static final Pattern LEVER_P = Pattern.compile(
+		"(레버리지|\\b2x\\b|\\b3x\\b|lever|ultra|daily\\s*(2x|3x))",
+		Pattern.CASE_INSENSITIVE
+	);
+	private static final Pattern INVERSE_P = Pattern.compile(
+		"(인버스|\\b-1x\\b|\\b-2x\\b|inverse|bear)",
+		Pattern.CASE_INSENSITIVE
+	);
+	private static final Pattern BOND_P = Pattern.compile(
+		"(채권|회사채|국채|국공채|크레딧|bond|treasury|corporate\\s*bond|credit)",
+		Pattern.CASE_INSENSITIVE
+	);
+
+	// 혼합/커버드콜/액티브는 참고용
+	private static final Pattern MIX_HINT_P = Pattern.compile(
+		"(커버드콜|밸런스|혼합|액티브)", Pattern.CASE_INSENSITIVE
+	);
 
 	// 1) 지표별 점수화 기준(임계값)
 	private static final double[] VOL_THRESHOLDS = {0.10, 0.20, 0.30, 0.40, 0.50};
@@ -28,36 +51,46 @@ public class ProductCal {
 	 * ETF 가격 이력과 ETF 유형을 받아 1~6 등급을 반환합니다.
 	 * history 리스트는 과거 순서(오래된 순)로 정렬되어 있어야 합니다.
 	 */
-	public static InvestType classify(List<ETFPriceRes.Item> history, String etfType) {
+	public static InvestType classify(List<EtfDailyHistory> history, String etfType, String shortenCode) {
 		if (history == null || history.size() < 2) {
-			throw new IllegalArgumentException("최소 2일치 데이터가 필요합니다.");
+			//log.error("ETF 상품 history 부족 shortenCode={}", shortenCode);
+			return InvestType.VERY_AGGRESSIVE;
 		}
 
+		history.sort(Comparator.comparing(EtfDailyHistory::getBaseDate));
+
 		// 1) 숫자 리스트 변환
+		// 등락률(%) → 일일수익률(소수)로 변환: 0.930(%) → 0.00930
 		List<Double> dailyReturns = history.stream()
-			.map(it -> it.getFltRt()
-				.divide(BigDecimal.valueOf(100), 10, BigDecimal.ROUND_HALF_UP)
+			.map(it -> safe(it.getFluctuationRate())
+				.divide(BigDecimal.valueOf(100), 10, RoundingMode.HALF_UP)
 				.doubleValue())
 			.collect(Collectors.toList());
 
 		List<Double> prices = history.stream()
-			.map(it -> it.getClpr().doubleValue())
+			.map(it -> toDouble(it.getClosingPrice()))
 			.collect(Collectors.toList());
 
 		List<Double> intradayVols = history.stream()
 			.map(it -> {
-				double high = it.getHipr().doubleValue();
-				double low = it.getLopr().doubleValue();
-				double open = it.getMkp().doubleValue();
+				double high = toDouble(it.getHighPrice());
+				double low = toDouble(it.getLowPrice());
+				double open = toDouble(it.getMarketOpenPrice());
+				// 시가가 0(또는 null)이면 분모를 종가로 대체, 그마저도 0이면 0 반환
+				if (open == 0.0) {
+					open = toDouble(it.getClosingPrice());
+					if (open == 0.0)
+						return 0.0;
+				}
 				return (high - low) / open;
 			})
 			.collect(Collectors.toList());
 
 		List<Double> volumes = history.stream()
-			.map(it -> it.getTrqu().doubleValue())
+			.map(it -> toDouble(it.getTradeQuantity()))
 			.collect(Collectors.toList());
 
-		// 2) 위험 지표 계산
+		// 2) 위험 지표 계산 (기존 유틸 재사용)
 		double volAnnualized = calculateAnnualizedVolatility(dailyReturns);
 		double var95 = calculateVaR(dailyReturns, 0.05);
 		double mdd = calculateMaxDrawdown(prices);
@@ -69,11 +102,11 @@ public class ProductCal {
 		int scoreVar = score(var95, VAR_THRESHOLDS);
 		int scoreMDD = score(mdd, MDD_THRESHOLDS);
 		int scoreIntra = score(intradayAvg, INTRADAY_THRESHOLDS);
-		int scoreLiqVol = score(liqRisk, LIQ_THRESHOLDS);
+		int scoreLiq = score(liqRisk, LIQ_THRESHOLDS);
 
-		double scoreLiquidComposite = (scoreIntra + scoreLiqVol) / 2.0;
+		double scoreLiquidComposite = (scoreIntra + scoreLiq) / 2.0;
 
-		// 4) 가중평균 → rawScore
+		// 4) 가중합
 		double rawScore = scoreVol * W_VOL
 			+ scoreVar * W_VAR
 			+ scoreMDD * W_MDD
@@ -105,6 +138,19 @@ public class ProductCal {
 				return InvestType.VERY_AGGRESSIVE;
 		}
 	}
+
+	private static BigDecimal safe(BigDecimal v) {
+		return v == null ? BigDecimal.ZERO : v;
+	}
+
+	private static double toDouble(Integer v) {
+		return v == null ? 0.0 : v.doubleValue();
+	}
+
+	private static double toDouble(Long v) {
+		return v == null ? 0.0 : v.doubleValue();
+	}
+
 	// ——————————————————————————————————————
 	// 지표 계산 함수들
 
@@ -159,5 +205,28 @@ public class ProductCal {
 
 	private static int clamp(int x, int min, int max) {
 		return Math.max(min, Math.min(max, x));
+	}
+
+	/**
+	 * itemName / baseIndexName에서 타입을 추론해
+	 * classify()의 etfType에 넣을 문자열을 반환합니다.
+	 * 반환값: "leveraged" | "inverse" | "bond" | ""(보정 없음)
+	 */
+	public static String inferEtfType(String itemName, String baseIndexName) {
+		String src = ((itemName == null ? "" : itemName) + " " +
+			(baseIndexName == null ? "" : baseIndexName)).toLowerCase();
+
+		if (LEVER_P.matcher(src).find())
+			return "leveraged";
+		if (INVERSE_P.matcher(src).find())
+			return "inverse";
+
+		boolean hasBond = BOND_P.matcher(src).find();
+		if (hasBond) {
+			// 혼합/커버드콜 여부는 참고용이지만, 우리 보정은 -0.5라 과하지 않음 → bond 유지
+			return "bond";
+		}
+
+		return "";
 	}
 }

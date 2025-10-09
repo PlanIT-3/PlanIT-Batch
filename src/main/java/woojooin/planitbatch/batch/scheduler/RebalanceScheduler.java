@@ -23,9 +23,9 @@ public class RebalanceScheduler {
 
 	/**
 	 * 리밸런스 산출 배치
-	 * 매일 01:35 KST 실행
+	 *
 	 */
-	@Scheduled(cron = "0 41 12 * * *", zone = "Asia/Seoul")
+	@Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
 	public void runRebalanceJob() {
 		try {
 			log.info("[Rebalance Batch] - runRebalanceJob() start ===>>>>>");
