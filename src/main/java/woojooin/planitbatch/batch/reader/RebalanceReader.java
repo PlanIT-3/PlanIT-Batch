@@ -28,7 +28,7 @@ public class RebalanceReader implements ItemReader<Balance> {
 	private int nextOffset = -1;
 	private int cursorInPage = 0;
 	private List<Balance> currentList = Collections.emptyList();
-	public static int CHUNK_SIZE = 10;
+	public static int CHUNK_SIZE = 50;
 
 	@Override
 	public Balance read() {

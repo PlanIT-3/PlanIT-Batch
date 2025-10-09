@@ -53,7 +53,7 @@ public class ProductCal {
 	 */
 	public static InvestType classify(List<EtfDailyHistory> history, String etfType, String shortenCode) {
 		if (history == null || history.size() < 2) {
-			log.error("ETF 상품 history 부족 shortenCode={}", shortenCode);
+			//log.error("ETF 상품 history 부족 shortenCode={}", shortenCode);
 			return InvestType.VERY_AGGRESSIVE;
 		}
 

@@ -50,6 +50,7 @@ public class RebalanceProcessor implements ItemProcessor<Balance, Rebalance> {
 
 		long end = System.nanoTime();
 		long elapsedTime = end - start;
+		System.out.println("Elapsed time: " + elapsedTime + " ns");
 
 		synchronized (RebalanceProcessor.class) {
 			totalElapsed += elapsedTime;
