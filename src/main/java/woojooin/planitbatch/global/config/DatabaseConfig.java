@@ -7,9 +7,6 @@ import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.batch.core.configuration.annotation.BatchConfigurer;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -29,6 +26,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Configuration
 @PropertySource("classpath:application.properties")
 @MapperScan(basePackages = {"woojooin.planitbatch.domain.mapper", "woojooin.planitbatch.domain.product.mapper",
@@ -59,7 +59,6 @@ public class DatabaseConfig implements BatchConfigurer {
 	@Value("${batch.jdbc.password}")
 	private String batchPassword;
 
-
 	@Bean
 	@Primary
 	public DataSource dataSource() {
@@ -75,9 +74,13 @@ public class DatabaseConfig implements BatchConfigurer {
 		config.setMaxLifetime(1200000);
 		config.setLeakDetectionThreshold(15000);
 
+		log.info("================> batch source");
+		log.info("url={}", url);
+		log.info("username={}", username);
+		log.info("password={}", password);
+
 		return new HikariDataSource(config);
 	}
-
 
 	@Bean("batchDataSource")
 	public DataSource batchDataSource() {
@@ -87,6 +90,11 @@ public class DatabaseConfig implements BatchConfigurer {
 		config.setUsername(batchUsername);
 		config.setPassword(batchPassword);
 		config.setMaximumPoolSize(5);
+
+		log.info("================> batch source");
+		log.info("url={}", batchUrl);
+		log.info("username={}", batchUsername);
+		log.info("password={}", batchPassword);
 
 		config.setConnectionTimeout(20000);
 		config.setIdleTimeout(300000);
@@ -102,7 +110,7 @@ public class DatabaseConfig implements BatchConfigurer {
 
 		sessionFactory.setDataSource(dataSource());
 
-        sessionFactory.setConfigLocation(new ClassPathResource("mybatis-config.xml"));
+		sessionFactory.setConfigLocation(new ClassPathResource("mybatis-config.xml"));
 		sessionFactory.setMapperLocations(
 			new PathMatchingResourcePatternResolver()
 				.getResources("classpath:mapper/*.xml")
