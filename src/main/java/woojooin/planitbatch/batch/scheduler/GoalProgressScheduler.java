@@ -26,7 +26,7 @@ public class GoalProgressScheduler {
 	@Qualifier("dailyGoalProgressJob")
 	private Job goalProgressJob;
 
-	@Scheduled(cron = "0 30 21 * * ?")
+	@Scheduled(cron = "0 0 0 * * ?")
 	public void runGoalProgressJob() {
 		try {
 			log.info("목표 진행률 계산 배치 작업 시작");

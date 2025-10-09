@@ -24,10 +24,10 @@ public class ProductSchedular {
 	/**
 	 * product 예상 수익 계산 작업 배치
 	 */
-	@Scheduled(cron = "0 27 1 * * *", zone = "Asia/Seoul")
+	@Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
 	public void runExpectedReturnResultBatch() {
 		try {
-			log.info("[Product Batch] - runExpectedReturnResultBatch() start ===>>>>>");
+			log.info("[Product Batch] - runExpectedReturnResultBatch() start {} ===>>>>>");
 			JobParameters params = new JobParametersBuilder()
 				.addLong("timestamp", System.currentTimeMillis())
 				.toJobParameters();
