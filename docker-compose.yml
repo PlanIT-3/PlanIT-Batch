@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: plan-it-batch
     ports:
-      - "8081:8080"
+      - "42200:8080"
     env_file:
       - .env
     networks:
