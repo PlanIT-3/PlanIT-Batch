@@ -62,6 +62,11 @@ public class DatabaseConfig implements BatchConfigurer {
 	@Bean
 	@Primary
 	public DataSource dataSource() {
+		log.info("================> db source");
+		log.info("url={}", url);
+		log.info("username={}", username);
+		log.info("password={}", password);
+
 		HikariConfig config = new HikariConfig();
 		config.setDriverClassName(driverClassName);
 		config.setJdbcUrl(url);
@@ -74,27 +79,22 @@ public class DatabaseConfig implements BatchConfigurer {
 		config.setMaxLifetime(1200000);
 		config.setLeakDetectionThreshold(15000);
 
-		log.info("================> batch source");
-		log.info("url={}", url);
-		log.info("username={}", username);
-		log.info("password={}", password);
-
 		return new HikariDataSource(config);
 	}
 
 	@Bean("batchDataSource")
 	public DataSource batchDataSource() {
+		log.info("================> batch source");
+		log.info("url={}", batchUrl);
+		log.info("username={}", batchUsername);
+		log.info("password={}", batchPassword);
+
 		HikariConfig config = new HikariConfig();
 		config.setDriverClassName(batchDriverClassName);
 		config.setJdbcUrl(batchUrl);
 		config.setUsername(batchUsername);
 		config.setPassword(batchPassword);
 		config.setMaximumPoolSize(5);
-
-		log.info("================> batch source");
-		log.info("url={}", batchUrl);
-		log.info("username={}", batchUsername);
-		log.info("password={}", batchPassword);
 
 		config.setConnectionTimeout(20000);
 		config.setIdleTimeout(300000);
