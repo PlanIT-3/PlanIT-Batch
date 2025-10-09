@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="woojooin.planitbatch.domain.mapper.MemberProductMapper">
-    
-    
+
+
     <select id="getMemberProductsByMemberIds" resultType="woojooin.planitbatch.domain.vo.MemberProduct">
-        SELECT 
+        SELECT
             member_product_id as memberProductId,
             member_id as memberId,
-            product_id as shortenCode,
+        product_id as productId,
+        product_id as shortenCode,
             present_amount as presentAmount,
             quantity
         FROM member_product
-        WHERE member_id IN 
+        WHERE member_id IN
         <foreach collection="memberIds" item="memberId" open="(" close=")" separator=",">
             #{memberId}
         </foreach>
     </select>
-    
+
     <select id="getMemberProductsByIds" resultType="woojooin.planitbatch.domain.vo.MemberProduct">
-        SELECT 
+        SELECT
             member_product_id as memberProductId,
             member_id as memberId,
             product_id as productId,
@@ -30,5 +31,44 @@
             #{memberProductId}
         </foreach>
     </select>
-    
+
+
+    <!-- MemberVo ResultMap -->
+    <resultMap id="MemberVoResultMap" type="woojooin.planitbatch.domain.vo.totalInvestAmountVo.MemberVo">
+        <id property="memberId" column="member_id"/>
+        <collection property="products" ofType="woojooin.planitbatch.domain.vo.totalInvestAmountVo.MemberProductVo">
+            <result property="memberId" column="member_id"/>
+            <result property="productId" column="product_id"/>
+            <result property="createdAt" column="created_at"/>
+            <result property="valuationAmount" column="valuation_amount"/>
+            <result property="quantity" column="quantity"/>
+            <result property="purchaseAmount" column="purchase_amount"/>
+            <result property="updatedAt" column="updated_at"/>
+        </collection>
+    </resultMap>
+
+    <!-- 멤버별 상품 정보 조회 -->
+    <select id="selectMemberWithProducts" resultMap="MemberVoResultMap">
+        SELECT
+            m.member_id,
+            mp.product_id,
+            mp.valuation_amount,
+            mp.quantity,
+            mp.purchase_amount,
+            mp.created_at,
+            mp.updated_at
+        FROM (
+            SELECT member_id
+            FROM member
+            ORDER BY member_id
+                LIMIT #{_skiprows}, #{_pagesize}
+        ) m
+                 Right Join member_product mp
+                           ON m.member_id = mp.member_id
+            AND mp.updated_at IS NOT NULL
+            AND mp.purchase_amount > 0
+            AND mp.quantity > 0
+        ORDER BY m.member_id, mp.updated_at
+    </select>
+
 </mapper>
