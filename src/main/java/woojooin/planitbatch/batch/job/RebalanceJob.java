@@ -1,5 +1,7 @@
 package woojooin.planitbatch.batch.job;
 
+import java.util.Collections;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -11,6 +13,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
 import lombok.RequiredArgsConstructor;
 import woojooin.planitbatch.batch.listener.JobExecutionTimeListener;
 import woojooin.planitbatch.batch.partitioner.RebalancePartitioner;
@@ -34,13 +38,16 @@ public class RebalanceJob {
 	private final RebalanceWriter rebalanceWriter;
 
 	@Bean
-	public ThreadPoolTaskExecutor batchTaskExecutor() {
+	public ThreadPoolTaskExecutor batchTaskExecutor(MeterRegistry registry) {
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 		executor.setCorePoolSize(4);
 		executor.setMaxPoolSize(4);
 		executor.setQueueCapacity(16);
 		executor.setThreadNamePrefix("rebalance-");
 		executor.initialize();
+
+		ExecutorServiceMetrics.monitor(registry, executor.getThreadPoolExecutor(), "batch-executor",
+			Collections.emptyList());
 		return executor;
 	}
 
