@@ -46,8 +46,12 @@ public class RebalanceJob {
 		executor.setThreadNamePrefix("rebalance-");
 		executor.initialize();
 
-		ExecutorServiceMetrics.monitor(registry, executor.getThreadPoolExecutor(), "batch-executor",
-			Collections.emptyList());
+		ExecutorServiceMetrics.monitor(
+			registry,
+			executor.getThreadPoolExecutor(),
+			"batch-executor",
+			Collections.emptyList()
+		);
 		return executor;
 	}
 
