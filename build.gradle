@@ -89,6 +89,11 @@ dependencies {
     implementation "io.micrometer:micrometer-core:1.13.1"
     implementation "io.micrometer:micrometer-registry-prometheus:1.13.1"
     implementation "io.micrometer:micrometer-jakarta9:1.13.1"
+
+
+//    implementation "io.micrometer:micrometer-core:1.12.5"
+//    implementation "io.micrometer:micrometer-registry-prometheus:1.12.5"
+//    implementation "io.micrometer:micrometer-jakarta9:1.12.5"
 }
 
 test {
