@@ -48,15 +48,6 @@ public class RebalanceProcessor implements ItemProcessor<Balance, Rebalance> {
 					.orElse(null));
 		}
 
-		long end = System.nanoTime();
-		long elapsedTime = end - start;
-		System.out.println("Elapsed time: " + elapsedTime + " ns");
-
-		synchronized (RebalanceProcessor.class) {
-			totalElapsed += elapsedTime;
-			count++;
-		}
-
 		if (target == null)
 			return null;
 
