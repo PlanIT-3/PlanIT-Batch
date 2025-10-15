@@ -7,6 +7,7 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -41,7 +42,7 @@ public class RebalanceJob {
 	}
 
 	@Bean
-	public PartitionHandler partitionHandler(ThreadPoolTaskExecutor batchTaskExecutor) {
+	public PartitionHandler partitionHandler(@Qualifier("batchTaskExecutor") ThreadPoolTaskExecutor batchTaskExecutor) {
 		TaskExecutorPartitionHandler handler = new TaskExecutorPartitionHandler();
 		handler.setTaskExecutor(batchTaskExecutor);
 		handler.setStep(rebalanceSlaveStep());

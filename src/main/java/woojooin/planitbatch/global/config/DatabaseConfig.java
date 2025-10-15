@@ -69,6 +69,11 @@ public class DatabaseConfig implements BatchConfigurer {
 		this.registry = registry;
 	}
 
+	@PostConstruct
+	public void checkRegistryType() {
+		System.out.println("[MeterRegistry] -> " + registry.getClass().getName());
+	}
+
 	// ✅ 여기에 추가
 	@PostConstruct
 	public void verifyExecutorMetrics() {
