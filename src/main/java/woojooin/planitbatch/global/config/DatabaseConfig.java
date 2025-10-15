@@ -23,6 +23,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.zaxxer.hikari.HikariConfig;
@@ -30,6 +31,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -170,6 +172,7 @@ public class DatabaseConfig implements BatchConfigurer {
 	public JobLauncher getJobLauncher() throws Exception {
 		SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
 		jobLauncher.setJobRepository(getJobRepository());
+		jobLauncher.setTaskExecutor(batchTaskExecutor(registry));
 		jobLauncher.afterPropertiesSet();
 		return jobLauncher;
 	}
@@ -180,5 +183,23 @@ public class DatabaseConfig implements BatchConfigurer {
 		jobExplorerFactoryBean.setDataSource(batchDataSource());
 		jobExplorerFactoryBean.afterPropertiesSet();
 		return jobExplorerFactoryBean.getObject();
+	}
+
+	@Bean
+	public ThreadPoolTaskExecutor batchTaskExecutor(MeterRegistry registry) {
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.setCorePoolSize(4);
+		executor.setMaxPoolSize(4);
+		executor.setQueueCapacity(16);
+		executor.setThreadNamePrefix("rebalance-");
+		executor.initialize();
+
+		ExecutorServiceMetrics.monitor(
+			registry,
+			executor.getThreadPoolExecutor(),
+			"batch-executor",
+			Collections.emptyList()
+		);
+		return executor;
 	}
 }
