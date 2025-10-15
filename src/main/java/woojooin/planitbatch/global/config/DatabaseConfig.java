@@ -192,6 +192,7 @@ public class DatabaseConfig implements BatchConfigurer {
 		executor.setMaxPoolSize(4);
 		executor.setQueueCapacity(16);
 		executor.setThreadNamePrefix("batch-executor-");
+		executor.initialize();
 
 		ExecutorServiceMetrics.monitor(
 			registry,
@@ -199,8 +200,6 @@ public class DatabaseConfig implements BatchConfigurer {
 			"batch-executor",
 			Collections.emptyList()
 		);
-
-		executor.initialize();
 		return executor;
 	}
 }
