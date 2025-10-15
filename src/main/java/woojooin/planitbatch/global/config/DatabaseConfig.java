@@ -2,6 +2,7 @@ package woojooin.planitbatch.global.config;
 
 import java.util.Collections;
 
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -66,6 +67,16 @@ public class DatabaseConfig implements BatchConfigurer {
 
 	public DatabaseConfig(MeterRegistry registry) {
 		this.registry = registry;
+	}
+
+	// ✅ 여기에 추가
+	@PostConstruct
+	public void verifyExecutorMetrics() {
+		log.info("==== Registered executor meters ====");
+		registry.getMeters().stream()
+			.filter(m -> m.getId().getName().startsWith("executor"))
+			.forEach(m -> log.info("Meter: {}", m.getId()));
+		log.info("=====================================");
 	}
 
 	@Bean
