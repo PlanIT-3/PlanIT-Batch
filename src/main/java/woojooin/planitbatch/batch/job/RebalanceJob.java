@@ -19,6 +19,7 @@ import woojooin.planitbatch.batch.writer.RebalanceWriter;
 import woojooin.planitbatch.domain.rebalance.repository.BalanceRepository;
 import woojooin.planitbatch.domain.rebalance.vo.Balance;
 import woojooin.planitbatch.domain.rebalance.vo.Rebalance;
+import woojooin.planitbatch.global.component.PartitionStepTimeLogger;
 
 @Configuration
 @RequiredArgsConstructor
@@ -32,6 +33,7 @@ public class RebalanceJob {
 	private final RebalanceReader rebalanceReader;
 	private final ItemProcessor<Balance, Rebalance> rebalanceProcessor;
 	private final RebalanceWriter rebalanceWriter;
+	private final PartitionStepTimeLogger partitionStepTimeLogger;
 
 	@Bean
 	public RebalancePartitioner rebalancePartitioner(BalanceRepository balanceRepository) {
@@ -62,6 +64,7 @@ public class RebalanceJob {
 			.reader(rebalanceReader)
 			.processor(rebalanceProcessor)
 			.writer(rebalanceWriter)
+			.listener(partitionStepTimeLogger)
 			.build();
 	}
 
