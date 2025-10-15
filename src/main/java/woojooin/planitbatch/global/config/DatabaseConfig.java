@@ -200,6 +200,7 @@ public class DatabaseConfig implements BatchConfigurer {
 			"batch-executor",
 			Collections.emptyList()
 		);
+
 		return executor;
 	}
 }
