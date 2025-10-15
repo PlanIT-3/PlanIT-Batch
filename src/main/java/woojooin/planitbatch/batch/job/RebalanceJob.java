@@ -37,8 +37,9 @@ public class RebalanceJob {
 	private final PartitionStepTimeLogger partitionStepTimeLogger;
 
 	@Bean
-	public RebalancePartitioner rebalancePartitioner(BalanceRepository balanceRepository) {
-		return new RebalancePartitioner(balanceRepository);
+	public RebalancePartitioner rebalancePartitioner(BalanceRepository balanceRepository,
+		ThreadPoolTaskExecutor batchExecutor) {
+		return new RebalancePartitioner(balanceRepository, batchExecutor);
 	}
 
 	@Bean
