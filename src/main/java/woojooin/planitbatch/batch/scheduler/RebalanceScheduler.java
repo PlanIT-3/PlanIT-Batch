@@ -25,14 +25,13 @@ public class RebalanceScheduler {
 	 * 리밸런스 산출 배치
 	 *
 	 */
-	@Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
+	@Scheduled(cron = "0 07 17 * * *", zone = "Asia/Seoul")
 	public void runRebalanceJob() {
 		try {
 			log.info("[Rebalance Batch] - runRebalanceJob() start ===>>>>>");
 			JobParameters params = new JobParametersBuilder()
 				.addLong("ts", System.currentTimeMillis())
 				.toJobParameters();
-
 			jobLauncher.run(rebalancingJob, params);
 			log.info("[Rebalance Batch] - runRebalanceJob() finish ===>>>>>");
 		} catch (Exception e) {

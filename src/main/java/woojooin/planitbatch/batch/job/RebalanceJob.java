@@ -17,7 +17,6 @@ import woojooin.planitbatch.batch.listener.JobExecutionTimeListener;
 import woojooin.planitbatch.batch.partitioner.RebalancePartitioner;
 import woojooin.planitbatch.batch.reader.RebalanceReader;
 import woojooin.planitbatch.batch.writer.RebalanceWriter;
-import woojooin.planitbatch.domain.rebalance.repository.BalanceRepository;
 import woojooin.planitbatch.domain.rebalance.vo.Balance;
 import woojooin.planitbatch.domain.rebalance.vo.Rebalance;
 import woojooin.planitbatch.global.component.PartitionStepTimeLogger;
@@ -35,12 +34,6 @@ public class RebalanceJob {
 	private final ItemProcessor<Balance, Rebalance> rebalanceProcessor;
 	private final RebalanceWriter rebalanceWriter;
 	private final PartitionStepTimeLogger partitionStepTimeLogger;
-
-	@Bean
-	public RebalancePartitioner rebalancePartitioner(BalanceRepository balanceRepository,
-		ThreadPoolTaskExecutor batchExecutor) {
-		return new RebalancePartitioner(balanceRepository, batchExecutor);
-	}
 
 	@Bean
 	public PartitionHandler partitionHandler(@Qualifier("batchTaskExecutor") ThreadPoolTaskExecutor batchTaskExecutor) {
@@ -78,5 +71,4 @@ public class RebalanceJob {
 			.partitionHandler(partitionHandler)
 			.build();
 	}
-
 }

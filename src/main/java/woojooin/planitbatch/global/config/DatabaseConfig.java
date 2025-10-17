@@ -1,6 +1,7 @@
 package woojooin.planitbatch.global.config;
 
 import java.util.Collections;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
@@ -16,6 +17,8 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -65,23 +68,20 @@ public class DatabaseConfig implements BatchConfigurer {
 
 	private final MeterRegistry registry;
 
+	@Autowired
+	@Qualifier("batchTaskExecutor")
+	private ThreadPoolTaskExecutor batchTaskExecutor;
+
 	public DatabaseConfig(MeterRegistry registry) {
 		this.registry = registry;
 	}
 
 	@PostConstruct
-	public void checkRegistryType() {
-		System.out.println("[MeterRegistry] -> " + registry.getClass().getName());
-	}
-
-	// ✅ 여기에 추가
-	@PostConstruct
-	public void verifyExecutorMetrics() {
-		log.info("==== Registered executor meters ====");
-		registry.getMeters().stream()
-			.filter(m -> m.getId().getName().startsWith("executor"))
-			.forEach(m -> log.info("Meter: {}", m.getId()));
-		log.info("=====================================");
+	public void registerExecutorMetrics() {
+		ThreadPoolExecutor delegate = batchTaskExecutor.getThreadPoolExecutor();
+		ExecutorServiceMetrics.monitor(registry, delegate, "batch-executor",
+			Collections.singletonList(Tag.of("name", "batch-executor")));
+		log.info("✅ Executor metrics bound for batchTaskExecutor");
 	}
 
 	@Bean
@@ -125,31 +125,6 @@ public class DatabaseConfig implements BatchConfigurer {
 		return ds;
 	}
 
-	/**
-	 * ✅ HikariCP 메트릭을 수동 Gauge로 등록
-	 */
-	private void registerHikariMetrics(HikariDataSource ds, String poolName) {
-		registry.gauge("hikaricp_connections_active",
-			Collections.singletonList(Tag.of("pool", poolName)),
-			ds, d -> d.getHikariPoolMXBean().getActiveConnections());
-
-		registry.gauge("hikaricp_connections_idle",
-			Collections.singletonList(Tag.of("pool", poolName)),
-			ds, d -> d.getHikariPoolMXBean().getIdleConnections());
-
-		registry.gauge("hikaricp_connections_pending",
-			Collections.singletonList(Tag.of("pool", poolName)),
-			ds, d -> d.getHikariPoolMXBean().getThreadsAwaitingConnection());
-
-		registry.gauge("hikaricp_connections_max",
-			Collections.singletonList(Tag.of("pool", poolName)),
-			ds, d -> d.getHikariConfigMXBean().getMaximumPoolSize());
-
-		registry.gauge("hikaricp_connections_min",
-			Collections.singletonList(Tag.of("pool", poolName)),
-			ds, d -> d.getHikariConfigMXBean().getMinimumIdle());
-	}
-
 	@Bean
 	public SqlSessionFactory sqlSessionFactory() throws Exception {
 		SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
@@ -188,7 +163,7 @@ public class DatabaseConfig implements BatchConfigurer {
 	public JobLauncher getJobLauncher() throws Exception {
 		SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
 		jobLauncher.setJobRepository(getJobRepository());
-		jobLauncher.setTaskExecutor(batchTaskExecutor(registry));
+		jobLauncher.setTaskExecutor(batchTaskExecutor);
 		jobLauncher.afterPropertiesSet();
 		return jobLauncher;
 	}
@@ -210,13 +185,31 @@ public class DatabaseConfig implements BatchConfigurer {
 		executor.setThreadNamePrefix("batch-executor-");
 		executor.initialize();
 
-		ExecutorServiceMetrics.monitor(
-			registry,
-			executor.getThreadPoolExecutor(),
-			"batch-executor",
-			Collections.emptyList()
-		);
-
 		return executor;
+	}
+
+	/**
+	 * HikariCP 메트릭을 수동 Gauge로 등록
+	 */
+	private void registerHikariMetrics(HikariDataSource ds, String poolName) {
+		registry.gauge("hikaricp_connections_active",
+			Collections.singletonList(Tag.of("pool", poolName)),
+			ds, d -> d.getHikariPoolMXBean().getActiveConnections());
+
+		registry.gauge("hikaricp_connections_idle",
+			Collections.singletonList(Tag.of("pool", poolName)),
+			ds, d -> d.getHikariPoolMXBean().getIdleConnections());
+
+		registry.gauge("hikaricp_connections_pending",
+			Collections.singletonList(Tag.of("pool", poolName)),
+			ds, d -> d.getHikariPoolMXBean().getThreadsAwaitingConnection());
+
+		registry.gauge("hikaricp_connections_max",
+			Collections.singletonList(Tag.of("pool", poolName)),
+			ds, d -> d.getHikariConfigMXBean().getMaximumPoolSize());
+
+		registry.gauge("hikaricp_connections_min",
+			Collections.singletonList(Tag.of("pool", poolName)),
+			ds, d -> d.getHikariConfigMXBean().getMinimumIdle());
 	}
 }
