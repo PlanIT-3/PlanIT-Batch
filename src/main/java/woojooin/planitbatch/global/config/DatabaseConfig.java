@@ -163,7 +163,7 @@ public class DatabaseConfig implements BatchConfigurer {
 	public JobLauncher getJobLauncher() throws Exception {
 		SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
 		jobLauncher.setJobRepository(getJobRepository());
-		jobLauncher.setTaskExecutor(batchTaskExecutor);
+		// jobLauncher.setTaskExecutor(batchTaskExecutor);
 		jobLauncher.afterPropertiesSet();
 		return jobLauncher;
 	}
