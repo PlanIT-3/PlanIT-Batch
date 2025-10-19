@@ -20,7 +20,7 @@ public class RebalanceReader implements ItemReader<Balance> {
 	private int cursorInPage = 0;
 	private List<Balance> currentList = Collections.emptyList();
 	public static int CHUNK_SIZE = 50;
-	private static final int MAX_LIMIT = 50000; // ✅ 전체 범위
+	private static final int MAX_LIMIT = 200000; // ✅ 전체 범위
 
 	@Override
 	public Balance read() {
