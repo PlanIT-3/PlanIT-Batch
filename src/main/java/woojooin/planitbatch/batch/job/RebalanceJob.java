@@ -4,12 +4,17 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.partition.PartitionHandler;
+import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import lombok.RequiredArgsConstructor;
 import woojooin.planitbatch.batch.listener.JobExecutionTimeListener;
+import woojooin.planitbatch.batch.partitioner.RebalancePartitioner;
 import woojooin.planitbatch.batch.reader.RebalanceReader;
 import woojooin.planitbatch.batch.writer.RebalanceWriter;
 import woojooin.planitbatch.domain.rebalance.vo.Balance;
@@ -30,60 +35,60 @@ public class RebalanceJob {
 	private final RebalanceWriter rebalanceWriter;
 	private final PartitionStepTimeLogger partitionStepTimeLogger;
 
-	// @Bean
-	// public PartitionHandler partitionHandler(@Qualifier("batchTaskExecutor") ThreadPoolTaskExecutor batchTaskExecutor) {
-	// 	TaskExecutorPartitionHandler handler = new TaskExecutorPartitionHandler();
-	// 	handler.setTaskExecutor(batchTaskExecutor);
-	// 	handler.setStep(rebalanceSlaveStep());
-	// 	handler.setGridSize(4);
-	// 	return handler;
-	// }
-	//
-	// @Bean("rebalancingJob")
-	// public Job rebalancingJob(Step rebalanceMasterStep) {
-	// 	return jobBuilderFactory.get("rebalancingJob")
-	// 		.listener(jobExecutionTimeListener)
-	// 		.start(rebalanceMasterStep)
-	// 		.build();
-	// }
-
-	// @Bean
-	// public Step rebalanceSlaveStep() {
-	// 	return stepBuilderFactory.get("rebalanceSlaveStep")
-	// 		.<Balance, Rebalance>chunk(RebalanceReader.CHUNK_SIZE)
-	// 		.reader(rebalanceReader)
-	// 		.processor(rebalanceProcessor)
-	// 		.writer(rebalanceWriter)
-	// 		.listener(partitionStepTimeLogger)
-	// 		.build();
-	// }
-	//
-	// @Bean
-	// public Step rebalanceMasterStep(RebalancePartitioner partitioner,
-	// 	PartitionHandler partitionHandler) {
-	// 	return stepBuilderFactory.get("rebalanceMasterStep")
-	// 		.partitioner("rebalanceSlaveStep", partitioner)
-	// 		.partitionHandler(partitionHandler)
-	// 		.build();
-	// }
+	@Bean
+	public PartitionHandler partitionHandler(@Qualifier("batchTaskExecutor") ThreadPoolTaskExecutor batchTaskExecutor) {
+		TaskExecutorPartitionHandler handler = new TaskExecutorPartitionHandler();
+		handler.setTaskExecutor(batchTaskExecutor);
+		handler.setStep(rebalanceSlaveStep());
+		handler.setGridSize(4);
+		return handler;
+	}
 
 	@Bean("rebalancingJob")
-	public Job rebalancingJob() {
+	public Job rebalancingJob(Step rebalanceMasterStep) {
 		return jobBuilderFactory.get("rebalancingJob")
 			.listener(jobExecutionTimeListener)
-			.start(rebalanceSingleStep()) // ✅ 바로 단일 step 실행
+			.start(rebalanceMasterStep)
 			.build();
 	}
 
 	@Bean
-	public Step rebalanceSingleStep() {
-		return stepBuilderFactory.get("rebalanceSingleStep")
+	public Step rebalanceSlaveStep() {
+		return stepBuilderFactory.get("rebalanceSlaveStep")
 			.<Balance, Rebalance>chunk(RebalanceReader.CHUNK_SIZE)
 			.reader(rebalanceReader)
 			.processor(rebalanceProcessor)
 			.writer(rebalanceWriter)
-			.listener(partitionStepTimeLogger) // 원래 리스너 그대로 사용 가능
+			.listener(partitionStepTimeLogger)
 			.build();
 	}
+
+	@Bean
+	public Step rebalanceMasterStep(RebalancePartitioner partitioner,
+		PartitionHandler partitionHandler) {
+		return stepBuilderFactory.get("rebalanceMasterStep")
+			.partitioner("rebalanceSlaveStep", partitioner)
+			.partitionHandler(partitionHandler)
+			.build();
+	}
+
+	// @Bean("rebalancingJob")
+	// public Job rebalancingJob() {
+	// 	return jobBuilderFactory.get("rebalancingJob")
+	// 		.listener(jobExecutionTimeListener)
+	// 		.start(rebalanceSingleStep()) // ✅ 바로 단일 step 실행
+	// 		.build();
+	// }
+	//
+	// @Bean
+	// public Step rebalanceSingleStep() {
+	// 	return stepBuilderFactory.get("rebalanceSingleStep")
+	// 		.<Balance, Rebalance>chunk(RebalanceReader.CHUNK_SIZE)
+	// 		.reader(rebalanceReader)
+	// 		.processor(rebalanceProcessor)
+	// 		.writer(rebalanceWriter)
+	// 		.listener(partitionStepTimeLogger) // 원래 리스너 그대로 사용 가능
+	// 		.build();
+	// }
 
 }
