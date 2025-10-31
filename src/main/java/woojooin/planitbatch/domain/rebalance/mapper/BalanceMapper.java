@@ -16,4 +16,10 @@ public interface BalanceMapper {
 	List<Balance> findBalancePanging(@Param("offset") int offset,
 		@Param("limit") int limit);
 
+	List<Balance> findBalanceRange(@Param("startGoalId") Long startGoalId, @Param("endGoalId") Long endGoalId);
+
+	List<Balance> findBalanceChunk(@Param("startGoalId") long startGoalId,
+		@Param("endGoalId") long endGoalId,
+		@Param("cursorGoalId") long cursorGoalId,
+		@Param("limit") int limit);
 }

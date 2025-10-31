@@ -26,4 +26,12 @@ public class BalanceRepository {
 		return balanceMapper.findBalancePanging(offset, limit);
 	}
 
+	public List<Balance> findBalanceRange(long startGoalId, long endGoalId) {
+		return balanceMapper.findBalanceRange(startGoalId, endGoalId);
+	}
+
+	public List<Balance> findBalanceChunk(long startGoalId, long endGoalId, long cursorGoalId, int limit) {
+		return balanceMapper.findBalanceChunk(startGoalId, endGoalId, cursorGoalId, limit);
+	}
+
 }

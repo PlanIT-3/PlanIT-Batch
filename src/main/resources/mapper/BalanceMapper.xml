@@ -110,4 +110,32 @@
             LIMIT #{limit}
         OFFSET #{offset}
     </select>
+
+    <select id="findBalanceRange" resultMap="BalanceMap">
+        SELECT g.goal_id,
+               a.action_id,
+               mp.*,
+               p.*
+        FROM goal AS g
+                 JOIN action AS a ON a.goal_id = g.goal_id
+                 JOIN member_product AS mp ON mp.member_product_id = a.member_product_id
+                 JOIN product AS p ON mp.product_id = p.shorten_code
+        WHERE g.goal_id BETWEEN #{startGoalId} AND #{endGoalId}
+        ORDER BY g.goal_id ASC
+    </select>
+
+    <select id="findBalanceChunk" resultMap="BalanceMap">
+        SELECT g.goal_id,
+               a.action_id,
+               mp.*,
+               p.*
+        FROM goal AS g
+                 JOIN action AS a ON a.goal_id = g.goal_id
+                 JOIN member_product AS mp ON mp.member_product_id = a.member_product_id
+                 JOIN product AS p ON mp.product_id = p.shorten_code
+        WHERE g.goal_id BETWEEN #{startGoalId} AND #{endGoalId}
+          AND g.goal_id >= #{cursorGoalId}
+        ORDER BY g.goal_id ASC
+            LIMIT #{limit}
+    </select>
 </mapper>
