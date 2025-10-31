@@ -16,8 +16,8 @@ import woojooin.planitbatch.batch.reader.DepositReader;
 import woojooin.planitbatch.batch.reader.TaxCalculationReader;
 import woojooin.planitbatch.batch.writer.DepositWriter;
 import woojooin.planitbatch.batch.writer.TaxCalculationWriter;
-import woojooin.planitbatch.domain.vo.DepositVO;
 import woojooin.planitbatch.domain.vo.DepositTaxSavingVO;
+import woojooin.planitbatch.domain.vo.DepositVO;
 
 @Configuration
 public class BatchConfig {
@@ -35,7 +35,9 @@ public class BatchConfig {
 	@Autowired
 	private StepBuilderFactory steps;
 
+	@Autowired
 	private TaxCalculationReader taxCalculationReader;
+
 	@Autowired
 	private TaxCalculationProcessor taxCalculationProcessor;
 	@Autowired

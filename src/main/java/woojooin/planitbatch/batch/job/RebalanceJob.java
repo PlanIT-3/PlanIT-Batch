@@ -7,6 +7,7 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -16,9 +17,9 @@ import woojooin.planitbatch.batch.listener.JobExecutionTimeListener;
 import woojooin.planitbatch.batch.partitioner.RebalancePartitioner;
 import woojooin.planitbatch.batch.reader.RebalanceReader;
 import woojooin.planitbatch.batch.writer.RebalanceWriter;
-import woojooin.planitbatch.domain.rebalance.repository.BalanceRepository;
 import woojooin.planitbatch.domain.rebalance.vo.Balance;
 import woojooin.planitbatch.domain.rebalance.vo.Rebalance;
+import woojooin.planitbatch.global.component.PartitionStepTimeLogger;
 
 @Configuration
 @RequiredArgsConstructor
@@ -32,25 +33,10 @@ public class RebalanceJob {
 	private final RebalanceReader rebalanceReader;
 	private final ItemProcessor<Balance, Rebalance> rebalanceProcessor;
 	private final RebalanceWriter rebalanceWriter;
+	private final PartitionStepTimeLogger partitionStepTimeLogger;
 
 	@Bean
-	public ThreadPoolTaskExecutor batchTaskExecutor() {
-		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-		executor.setCorePoolSize(4);
-		executor.setMaxPoolSize(4);
-		executor.setQueueCapacity(16);
-		executor.setThreadNamePrefix("rebalance-");
-		executor.initialize();
-		return executor;
-	}
-
-	@Bean
-	public RebalancePartitioner rebalancePartitioner(BalanceRepository balanceRepository) {
-		return new RebalancePartitioner(balanceRepository);
-	}
-
-	@Bean
-	public PartitionHandler partitionHandler(ThreadPoolTaskExecutor batchTaskExecutor) {
+	public PartitionHandler partitionHandler(@Qualifier("batchTaskExecutor") ThreadPoolTaskExecutor batchTaskExecutor) {
 		TaskExecutorPartitionHandler handler = new TaskExecutorPartitionHandler();
 		handler.setTaskExecutor(batchTaskExecutor);
 		handler.setStep(rebalanceSlaveStep());
@@ -73,6 +59,7 @@ public class RebalanceJob {
 			.reader(rebalanceReader)
 			.processor(rebalanceProcessor)
 			.writer(rebalanceWriter)
+			.listener(partitionStepTimeLogger)
 			.build();
 	}
 
@@ -84,5 +71,24 @@ public class RebalanceJob {
 			.partitionHandler(partitionHandler)
 			.build();
 	}
+
+	// @Bean("rebalancingJob")
+	// public Job rebalancingJob() {
+	// 	return jobBuilderFactory.get("rebalancingJob")
+	// 		.listener(jobExecutionTimeListener)
+	// 		.start(rebalanceSingleStep()) // ✅ 바로 단일 step 실행
+	// 		.build();
+	// }
+	//
+	// @Bean
+	// public Step rebalanceSingleStep() {
+	// 	return stepBuilderFactory.get("rebalanceSingleStep")
+	// 		.<Balance, Rebalance>chunk(RebalanceReader.CHUNK_SIZE)
+	// 		.reader(rebalanceReader)
+	// 		.processor(rebalanceProcessor)
+	// 		.writer(rebalanceWriter)
+	// 		.listener(partitionStepTimeLogger) // 원래 리스너 그대로 사용 가능
+	// 		.build();
+	// }
 
 }

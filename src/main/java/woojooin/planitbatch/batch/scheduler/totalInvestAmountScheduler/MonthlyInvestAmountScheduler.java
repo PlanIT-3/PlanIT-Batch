@@ -1,6 +1,8 @@
 package woojooin.planitbatch.batch.scheduler.totalInvestAmountScheduler;
 
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -10,39 +12,37 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
 public class MonthlyInvestAmountScheduler {
-    @Autowired
-    private JobLauncher jobLauncher;
+	@Autowired
+	private JobLauncher jobLauncher;
 
-    @Autowired
-    @Qualifier("monthlyInvestJob")
-    private Job monthlyInvestJob;
+	@Autowired
+	@Qualifier("monthlyInvestJob")
+	private Job monthlyInvestJob;
 
-//    @Scheduled(cron = "0 0 0 1 * ?")// 매월 1일 자정에 실행
-@Scheduled(cron = "0 */2 * * * ?") // 테스트용, 2분마다 실행
-public void runMonthlyInvestmentJob() {
-        try {
-            log.info("월간 투자금액 계산 배치 작업 시작");
-            String targetDate = LocalDate.now().minusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+	@Scheduled(cron = "0 0 0 1 * *")
+	public void runMonthlyInvestmentJob() {
+		try {
+			log.info("월간 투자금액 계산 배치 작업 시작");
+			String targetDate = LocalDate.now().minusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-            JobParameters jobParameters = new JobParametersBuilder()
-                    .addString("targetDate", targetDate)
-                    .addLong("timestamp", System.currentTimeMillis())
-                    .toJobParameters();
-            log.info("배치 작업 시작 - targetDate: {}", targetDate);
+			JobParameters jobParameters = new JobParametersBuilder()
+				.addString("targetDate", targetDate)
+				.addLong("timestamp", System.currentTimeMillis())
+				.toJobParameters();
+			log.info("배치 작업 시작 - targetDate: {}", targetDate);
 
-            // Job 실행
-            jobLauncher.run(monthlyInvestJob, jobParameters);
+			// Job 실행
+			jobLauncher.run(monthlyInvestJob, jobParameters);
 
-            log.info("월간 투자금액 계산 배치 작업 완료");
-        } catch (Exception e) {
-            log.error("월간 투자금액 계산 배치 작업 실패", e);
-        }
-    }
+			log.info("월간 투자금액 계산 배치 작업 완료");
+		} catch (Exception e) {
+			log.error("월간 투자금액 계산 배치 작업 실패", e);
+		}
+	}
 
 }

@@ -12,6 +12,45 @@ import lombok.RequiredArgsConstructor;
 import woojooin.planitbatch.domain.rebalance.repository.BalanceRepository;
 import woojooin.planitbatch.domain.rebalance.vo.Balance;
 
+// @Component
+// @RequiredArgsConstructor
+// public class RebalanceReader implements ItemReader<Balance> {
+//
+// 	private final BalanceRepository balanceRepository;
+//
+// 	private int nextOffset = 0;
+// 	private int cursorInPage = 0;
+// 	private List<Balance> currentList = Collections.emptyList();
+// 	public static int CHUNK_SIZE = 50;
+// 	private static final int MAX_LIMIT = 200000; // ✅ 전체 범위
+//
+// 	@Override
+// 	public Balance read() {
+// 		// 현재 페이지 데이터를 모두 읽었다면 다음 페이지 로드
+// 		if (cursorInPage >= currentList.size()) {
+// 			if (nextOffset >= MAX_LIMIT) {
+// 				return null; // 전체 범위 끝
+// 			}
+//
+// 			int remaining = MAX_LIMIT - nextOffset;
+// 			int pageSize = Math.min(CHUNK_SIZE, remaining);
+//
+// 			currentList = balanceRepository.findBalancePanging(nextOffset, pageSize);
+// 			cursorInPage = 0;
+//
+// 			if (currentList.isEmpty()) {
+// 				return null; // 더 이상 데이터 없음
+// 			}
+// 		}
+//
+// 		Balance item = currentList.get(cursorInPage++);
+// 		if (cursorInPage >= currentList.size()) {
+// 			nextOffset += currentList.size();
+// 		}
+// 		return item;
+// 	}
+// }
+
 @Component
 @StepScope
 @RequiredArgsConstructor
