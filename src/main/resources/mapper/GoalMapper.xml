@@ -19,4 +19,15 @@
         ORDER BY goal_id ASC
         LIMIT #{limit}
     </select>
+
+
+    <select id="findMinId" resultType="long">
+        SELECT MIN(goal_id)
+        FROM goal
+    </select>
+
+    <select id="findMaxId" resultType="long">
+        SELECT MAX(goal_id)
+        FROM goal
+    </select>
 </mapper>

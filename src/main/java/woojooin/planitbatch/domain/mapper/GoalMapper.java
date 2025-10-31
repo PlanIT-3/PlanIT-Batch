@@ -9,5 +9,9 @@ import woojooin.planitbatch.domain.vo.Goal;
 
 @Mapper
 public interface GoalMapper {
-    List<Goal> getGoalsPaginated(Map<String, Object> params);
+	List<Goal> getGoalsPaginated(Map<String, Object> params);
+
+	Long findMinId();
+
+	Long findMaxId();
 }
