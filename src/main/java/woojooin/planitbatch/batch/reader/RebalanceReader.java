@@ -27,7 +27,7 @@ public class RebalanceReader implements ItemReader<Balance> {
 	@Value("#{stepExecutionContext['endGoalId']}")
 	private long endGoalId;
 
-	public static final int CHUNK_SIZE = 50;
+	public static final int CHUNK_SIZE = 100;
 
 	private List<Balance> buffer = Collections.emptyList();
 	private int cursorInChunk = 0;
