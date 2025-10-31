@@ -40,7 +40,7 @@ public class RebalanceJob {
 		TaskExecutorPartitionHandler handler = new TaskExecutorPartitionHandler();
 		handler.setTaskExecutor(batchTaskExecutor);
 		handler.setStep(rebalanceSlaveStep());
-		handler.setGridSize(4);
+		handler.setGridSize(8);
 		return handler;
 	}
 
