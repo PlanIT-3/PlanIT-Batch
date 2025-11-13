@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="woojooin.planitbatch.domain.mapper.DailyReturnMapper">
+    <select id="findAllForToday" resultType="woojooin.planitbatch.domain.vo.DailyReturn">
+        SELECT
+            mp.member_id AS memberId,
+            mp.product_id AS itemCode,
+            p.base_date AS returnDate,
+            sum(CAST(p.closing_price AS DECIMAL(20,2)) * mp.quantity )AS amount
+        FROM member_product mp
+        JOIN product p ON mp.product_id COLLATE utf8mb4_unicode_ci = p.shorten_code COLLATE utf8mb4_unicode_ci
+        WHERE DATE(p.base_date) = #{date}
+        GROUP BY mp.member_id, mp.product_id, p.base_date
+    </select>
+
+    <select id="findpast" resultType="woojooin.planitbatch.domain.vo.DailyReturn">
+        select
+            mp.member_id AS memberId,
+            mp.product_id AS itemCode,
+            edh.base_date AS returnDate,
+            CAST(edh.closing_price AS DECIMAL(20, 2))* mp.quantity AS amount
+        from etf_daily_history edh
+            join member_product mp ON mp.product_id = edh.shorten_code
+        WHERE edh.base_date BETWEEN #{startDate} AND #{endDate}
+        ORDER BY edh.base_date, mp.member_id
+    </select>
+
+
+    <select id="insert" parameterType="woojooin.planitbatch.domain.vo.DailyReturn">
+        INSERT INTO daily_return (member_id, item_code, return_date, amount)
+        VALUES (#{memberId}, #{itemCode}, #{returnDate}, #{amount})
+    </select>
+</mapper>
+

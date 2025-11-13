@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="woojooin.planitbatch.domain.mapper.InvestmentReturnMapper">
+
+    <select id="findDailyReturn" resultType="woojooin.planitbatch.domain.vo.InvestmentReturn">
+        SELECT
+            today.member_id AS memberId,
+            #{today} AS returnDate,
+            'DAILY' AS returnType,
+            today.amount AS amountNow,
+            IFNULL(yesterday.amount, 0) AS amountPast
+        FROM (
+                 SELECT member_id, SUM(amount) AS amount
+                 FROM daily_return
+                 WHERE return_date = #{today}
+                 GROUP BY member_id
+             ) today
+                 LEFT JOIN (
+            SELECT member_id, SUM(amount) AS amount
+            FROM daily_return
+            WHERE return_date = DATE_SUB(#{today}, INTERVAL 1 DAY)
+            GROUP BY member_id
+        ) yesterday ON today.member_id = yesterday.member_id
+    </select>
+
+    <select id="findWeeklyReturn" resultType="woojooin.planitbatch.domain.vo.InvestmentReturn">
+        SELECT
+            this_week.member_id AS memberId,
+            #{today} AS returnDate,
+            'WEEKLY' AS returnType,
+            this_week.amount AS amountNow,
+            IFNULL(last_week.amount, 0) AS amountPast
+        FROM (
+                 SELECT member_id, SUM(amount) AS amount
+                 FROM daily_return
+                 WHERE return_date = #{today}
+                 GROUP BY member_id
+             ) this_week
+                 LEFT JOIN (
+            SELECT member_id, SUM(amount) AS amount
+            FROM daily_return
+            WHERE return_date = DATE_SUB(#{today}, INTERVAL 7 DAY)
+            GROUP BY member_id
+        ) last_week ON this_week.member_id = last_week.member_id
+    </select>
+
+
+    <select id="findMonthlyReturn" resultType="woojooin.planitbatch.domain.vo.InvestmentReturn">
+        SELECT
+            this_month.member_id AS memberId,
+            #{today} AS returnDate,
+            'MONTHLY' AS returnType,
+            this_month.amount AS amountNow,
+            IFNULL(last_month.amount, 0) AS amountPast
+        FROM (
+                 SELECT member_id, SUM(amount) AS amount
+                 FROM daily_return
+                 WHERE return_date = #{today}
+                 GROUP BY member_id
+             ) this_month
+                 LEFT JOIN (
+            SELECT member_id, SUM(amount) AS amount
+            FROM daily_return
+            WHERE return_date = LAST_DAY(DATE_SUB(#{today}, INTERVAL 1 MONTH))
+            GROUP BY member_id
+        ) last_month ON this_month.member_id = last_month.member_id
+    </select>
+
+    <insert id="insert" parameterType="woojooin.planitbatch.domain.vo.InvestmentReturn">
+        INSERT INTO investment_return (member_id, return_type, return_date, return_rate, amount_now, amount_past)
+        VALUES (#{memberId}, #{returnType}, #{returnDate}, #{returnRate}, #{amountNow}, #{amountPast})
+    </insert>
+
+    <insert id="upsertMonthlyReturn" parameterType="woojooin.planitbatch.domain.vo.InvestmentReturn">
+        INSERT INTO investment_return
+        (member_id, return_type, return_date, amount_now, amount_past, return_rate)
+        VALUES
+            (#{memberId}, 'MONTHLY', #{returnDate},
+             #{amountNow}, #{amountPast}, #{returnRate})
+            ON DUPLICATE KEY UPDATE
+                                 amount_now  = VALUES(amount_now),
+                                 amount_past = VALUES(amount_past),
+                                 return_rate = VALUES(return_rate)
+    </insert>
+</mapper>
+
